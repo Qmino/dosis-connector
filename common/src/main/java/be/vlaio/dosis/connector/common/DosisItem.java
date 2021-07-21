@@ -1,0 +1,162 @@
+package be.vlaio.dosis.connector.common;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@JsonDeserialize(builder=DosisItem.Builder.class)
+public class DosisItem {
+
+    private UUID id;
+    private Verwerkingsstatus processingStatus;
+    private LocalDateTime wijzigingsDatum;
+    private String dossierNummer;
+    private String dossierNaam;
+    private String doorverwijzingsUrl;
+    private int product;
+    private List<Agent> agenten;
+    private DossierStatus status;
+    private Contact dossierBeheerder;
+
+    private DosisItem(UUID id, Verwerkingsstatus processingStatus, LocalDateTime wijzigingsDatum,
+                     String dossierNummer, String dossierNaam, String doorverwijzingsUrl,
+                     int product, List<Agent> agenten, DossierStatus status, Contact dossierBeheerder) {
+        this.id = id;
+        this.processingStatus = processingStatus;
+        this.wijzigingsDatum = wijzigingsDatum;
+        this.dossierNummer = dossierNummer;
+        this.dossierNaam = dossierNaam;
+        this.doorverwijzingsUrl = doorverwijzingsUrl;
+        this.product = product;
+        this.agenten = agenten;
+        this.status = status;
+        this.dossierBeheerder = dossierBeheerder;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Verwerkingsstatus getProcessingStatus() {
+        return processingStatus;
+    }
+
+    public LocalDateTime getWijzigingsDatum() {
+        return wijzigingsDatum;
+    }
+
+    public String getDossierNummer() {
+        return dossierNummer;
+    }
+
+    public String getDossierNaam() {
+        return dossierNaam;
+    }
+
+    public String getDoorverwijzingsUrl() {
+        return doorverwijzingsUrl;
+    }
+
+    public int getProduct() {
+        return product;
+    }
+
+    public List<Agent> getAgenten() {
+        return agenten;
+    }
+
+    public DossierStatus getStatus() {
+        return status;
+    }
+
+    public Contact getDossierBeheerder() {
+        return dossierBeheerder;
+    }
+
+    @JsonPOJOBuilder
+    public static final class Builder {
+        private UUID id;
+        private Verwerkingsstatus processingStatus;
+        private LocalDateTime wijzigingsDatum;
+        private String dossierNummer;
+        private String dossierNaam;
+        private String doorverwijzingsUrl;
+        private int product;
+        private List<Agent> agenten;
+        private DossierStatus status;
+        private Contact dossierBeheerder;
+
+        public Builder withId(UUID id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withProcessingStatus(Verwerkingsstatus processingStatus) {
+            this.processingStatus = processingStatus;
+            return this;
+        }
+
+        public Builder withWijzigingsDatum(LocalDateTime wijzigingsDatum) {
+            this.wijzigingsDatum = wijzigingsDatum;
+            return this;
+        }
+
+        public Builder withDossierNummer(String dossierNummer) {
+            this.dossierNummer = dossierNummer;
+            return this;
+        }
+
+        public Builder withDossierNaam(String dossierNaam) {
+            this.dossierNaam = dossierNaam;
+            return this;
+        }
+
+        public Builder withDoorverwijzingsUrl(String doorverwijzingsUrl) {
+            this.doorverwijzingsUrl = doorverwijzingsUrl;
+            return this;
+        }
+
+        public Builder withProduct(int product) {
+            this.product = product;
+            return this;
+        }
+
+        public Builder withAgenten(List<Agent> agenten) {
+            this.agenten = agenten;
+            return this;
+        }
+
+        public Builder withStatus(DossierStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder withDossierBeheerder(Contact dossierBeheerder) {
+            this.dossierBeheerder = dossierBeheerder;
+            return this;
+        }
+
+        public Builder but() {
+            return new Builder()
+                    .withId(id)
+                    .withProcessingStatus(processingStatus)
+                    .withWijzigingsDatum(wijzigingsDatum)
+                    .withDossierNummer(dossierNummer)
+                    .withDossierNaam(dossierNaam)
+                    .withDoorverwijzingsUrl(doorverwijzingsUrl)
+                    .withProduct(product)
+                    .withAgenten(agenten)
+                    .withStatus(status)
+                    .withDossierBeheerder(dossierBeheerder);
+        }
+
+        public DosisItem build() {
+            return new DosisItem(id, processingStatus, wijzigingsDatum, dossierNummer, dossierNaam,
+                    doorverwijzingsUrl, product, agenten, status, dossierBeheerder);
+        }
+    }
+}

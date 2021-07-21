@@ -9,10 +9,10 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>common</module>
         <module>controller</module>
         <module>poller</module>
         <module>wip</module>
         <module>pusher</module>
     </modules>
-
 </project>
