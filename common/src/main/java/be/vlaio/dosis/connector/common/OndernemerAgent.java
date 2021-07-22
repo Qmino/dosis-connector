@@ -7,8 +7,8 @@ import java.util.List;
 
 @JsonDeserialize(builder = OndernemerAgent.Builder.class)
 public class OndernemerAgent extends Agent {
-    private String kboNummer;
-    private List<ToegangsRecht> toegangsRechten;
+    private final String kboNummer;
+    private final List<ToegangsRecht> toegangsRechten;
 
     public OndernemerAgent(String kboNummer, List<ToegangsRecht> toegangsRechten) {
         this.kboNummer = kboNummer;

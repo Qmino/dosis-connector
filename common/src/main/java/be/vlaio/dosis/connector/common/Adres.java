@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonDeserialize(builder = Adres.Builder.class)
 public class Adres {
-    private String straat;
-    private String huisNummer;
-    private String postCode;
-    private String gemeente;
+    private final String straat;
+    private final String huisNummer;
+    private final String postCode;
+    private final String gemeente;
 
     private Adres(String straat, String huisNummer, String postCode, String gemeente) {
         this.straat = straat;

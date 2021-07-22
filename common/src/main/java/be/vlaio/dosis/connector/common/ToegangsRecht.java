@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(builder = ToegangsRecht.Builder.class)
 public class ToegangsRecht {
-    private String recht;
-    private String context;
+    private final String recht;
+    private final String context;
 
     private ToegangsRecht(String recht, String context) {
         this.recht = recht;

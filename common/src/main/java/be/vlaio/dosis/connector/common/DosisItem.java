@@ -4,29 +4,26 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @JsonDeserialize(builder=DosisItem.Builder.class)
 public class DosisItem {
 
-    private UUID id;
-    private Verwerkingsstatus processingStatus;
-    private LocalDateTime wijzigingsDatum;
-    private String dossierNummer;
-    private String dossierNaam;
-    private String doorverwijzingsUrl;
-    private int product;
-    private List<Agent> agenten;
-    private DossierStatus status;
-    private Contact dossierBeheerder;
+    private final UUID id;
+    private final LocalDateTime wijzigingsDatum;
+    private final String dossierNummer;
+    private final String dossierNaam;
+    private final String doorverwijzingsUrl;
+    private final int product;
+    private final List<Agent> agenten;
+    private final DossierStatus status;
+    private final Contact dossierBeheerder;
 
-    private DosisItem(UUID id, Verwerkingsstatus processingStatus, LocalDateTime wijzigingsDatum,
+    private DosisItem(UUID id, LocalDateTime wijzigingsDatum,
                      String dossierNummer, String dossierNaam, String doorverwijzingsUrl,
                      int product, List<Agent> agenten, DossierStatus status, Contact dossierBeheerder) {
         this.id = id;
-        this.processingStatus = processingStatus;
         this.wijzigingsDatum = wijzigingsDatum;
         this.dossierNummer = dossierNummer;
         this.dossierNaam = dossierNaam;
@@ -39,10 +36,6 @@ public class DosisItem {
 
     public UUID getId() {
         return id;
-    }
-
-    public Verwerkingsstatus getProcessingStatus() {
-        return processingStatus;
     }
 
     public LocalDateTime getWijzigingsDatum() {
@@ -80,7 +73,6 @@ public class DosisItem {
     @JsonPOJOBuilder
     public static final class Builder {
         private UUID id;
-        private Verwerkingsstatus processingStatus;
         private LocalDateTime wijzigingsDatum;
         private String dossierNummer;
         private String dossierNaam;
@@ -92,11 +84,6 @@ public class DosisItem {
 
         public Builder withId(UUID id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder withProcessingStatus(Verwerkingsstatus processingStatus) {
-            this.processingStatus = processingStatus;
             return this;
         }
 
@@ -143,7 +130,6 @@ public class DosisItem {
         public Builder but() {
             return new Builder()
                     .withId(id)
-                    .withProcessingStatus(processingStatus)
                     .withWijzigingsDatum(wijzigingsDatum)
                     .withDossierNummer(dossierNummer)
                     .withDossierNaam(dossierNaam)
@@ -155,7 +141,7 @@ public class DosisItem {
         }
 
         public DosisItem build() {
-            return new DosisItem(id, processingStatus, wijzigingsDatum, dossierNummer, dossierNaam,
+            return new DosisItem(id, wijzigingsDatum, dossierNummer, dossierNaam,
                     doorverwijzingsUrl, product, agenten, status, dossierBeheerder);
         }
     }

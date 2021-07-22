@@ -1,6 +1,5 @@
 package be.vlaio.dosis.connector.wip;
 
-import be.vlaio.dosis.connector.common.DosisItem;
 import be.vlaio.dosis.connector.common.Verwerkingsstatus;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,10 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,8 +27,8 @@ import java.util.stream.Stream;
  *     <li>Onder items een subfolder per verwerkingsstatus.</li>
  *     <li>In deze folder, 1 bestand per DosisItem in deze status. Elk item heeft als bestandsnaam de UUID van het item,
  *     met bestandsextensie .json</li>
- *     <li>Onder pollerconfigs 1 bestand per poller met daarin de configuratie van de poller</li> [TODO]
  * </ul>
+ * TODO: Onder pollerconfigs 1 bestand per poller met daarin de configuratie van de poller
  */
 @Component
 public class DiskStore {
@@ -52,7 +48,10 @@ public class DiskStore {
      */
     public DiskStore(@Value("${dosisgateway.storagefolder}") String rootFolder, ObjectMapper mapper) {
         this.mapper = mapper;
-        logger.debug("Initializing diskstore in " + rootFolder);
+        if (rootFolder == null || rootFolder.trim().isEmpty()) {
+            rootFolder = System.getProperty("user.dir");
+        }
+        logger.info("Initializing diskstore in " + rootFolder);
         try {
             File root = createIfNotExists(rootFolder);
             File itemFolder = createIfNotExists(root, "items");
@@ -65,10 +64,10 @@ public class DiskStore {
     }
 
     /**
-     * @return Geeft alle dosisitems terug die op de harde schijf bestaan, in een enkele lijst.
+     * @return Geeft alle workitems terug die op de harde schijf bestaan, in een enkele lijst.
      */
-    public List<DosisItem> fetchAll() {
-        List<DosisItem> result = new ArrayList<>();
+    public List<WorkItem> fetchAll() {
+        List<WorkItem> result = new ArrayList<>();
         for (File folder : folders.values()) {
             result.addAll(readItems(folder));
         }
@@ -76,27 +75,56 @@ public class DiskStore {
     }
 
     /**
-     * Slaat het dosisitem op schijf op. Indien het dosisitem reeds bestond, wordt het geupdate. Een update kan
+     * @return Geeft alle dosisitems terug die op de harde schijf bestaan en die niet de verwerkingsstatus
+     * COMPLETED hebben, in een enkele lijst.
+     */
+    public List<WorkItem> fetchAllUncompleted() {
+        List<WorkItem> result = new ArrayList<>();
+        for (Map.Entry<Verwerkingsstatus, File> entry: folders.entrySet()) {
+            if (entry.getKey() != Verwerkingsstatus.COMPLETED) {
+                result.addAll(readItems(entry.getValue()));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Haalt een workitem op met een gegeven id (indien dit bestaat).
+     * @param id de gewenste id
+     * @return Het gevraagde item indien het bestaat.
+     */
+    public Optional<WorkItem> fetchById(UUID id) {
+        for (File folder: folders.values()) {
+            File file = new File(folder.getAbsolutePath() + File.separator + id + ".json");
+            if (file.exists()) {
+                return readWorkItemFromFile(file);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Slaat het dosisitem op schijf op. Indien het dosisitem reeds bestond, wordt het geüpdatet. Een update kan
      * eventueel een verplaatsing van het bestand tot gevolg hebben, als de dosisitem van plaats is veranderd.
      *
      * @param item Het item dat moet worden opgeslagen.
      */
-    public void upsert(DosisItem item) {
+    public void upsert(WorkItem item) {
         try {
             String json = mapper.writeValueAsString(item);
-            File folder = folders.get(item.getProcessingStatus());
+            File folder = folders.get(item.getCurrentStatus());
             if (folder == null) {
-                // Zou nooit mogen gebeuren, aangezien dit betekent dat de component incorrect is geinitialiseerd.
+                // Zou nooit mogen gebeuren, aangezien dit betekent dat de component incorrect is geïnitialiseerd.
                 // We verkiezen ervoor een exception te gooien ipv data te verliezen.
                 throw new RuntimeException("Critical error: unable to store dosisitem with status: " +
-                        item.getProcessingStatus());
+                        item.getCurrentStatus());
             } else {
-                String fileName =  item.getId() + ".json";
+                String fileName =  item.getDosisItem().getId() + ".json";
                 writeToFile(json, folder.getAbsolutePath() + File.separator + fileName);
                 // Delete the file in all other statuses (if they exist) and collect those that can not be deleted!
                 List<File> problematicFiles = folders.values().stream()
                         .filter(f -> f != folder)
-                        .flatMap(f -> streamOf(f.listFiles((dir, name) -> name.equals(item.getId() + ".json"))))
+                        .flatMap(f -> streamOf(f.listFiles((dir, name) -> name.equals(item.getDosisItem().getId() + ".json"))))
                         .filter(f -> ! f.delete())
                         .collect(Collectors.toList());
                 if (problematicFiles.size() > 0)
@@ -108,7 +136,7 @@ public class DiskStore {
         } catch (JsonProcessingException e) {
             logger.error("Unexpected JSON serizalization issue", e);
         } catch (IOException e) {
-            logger.error("Unable to write item " + item.getId() + " to file.", e);
+            logger.error("Unable to write item " + item.getDosisItem().getId() + " to file.", e);
             throw new RuntimeException(e);
         }
     }
@@ -119,8 +147,8 @@ public class DiskStore {
      * @param item het te verwijderen item
      * @return of er effectief een bestand is verwijderd
      */
-    public boolean delete(DosisItem item) {
-        String relativeFileName = File.separator + item.getId() + ".json";
+    public boolean delete(WorkItem item) {
+        String relativeFileName = File.separator + item.getDosisItem().getId() + ".json";
         // Normaal staat het item in de folder van de verwerkingsstatus van het item.
         // Voor de zekerheid kijken we in alle folders.
         boolean result = false;
@@ -163,24 +191,30 @@ public class DiskStore {
      *               lijst van DosisItems teruggegeven.
      * @return Alle dosisitems in de folder.
      */
-    private List<DosisItem> readItems(File folder) {
-        List<DosisItem> result = new ArrayList<>();
+    private List<WorkItem> readItems(File folder) {
+        List<WorkItem> result = new ArrayList<>();
         if ((folder != null) && folder.exists()) {
             File[] files = folder.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    try {
-                        String s = Files.readString(Path.of(file.getAbsolutePath()));
-                        result.add(mapper.readValue(s, DosisItem.class));
-                    } catch (JacksonException je) {
-                        logger.debug("File " + file.getName() + " does not correspond to valid DosisItem, skipped.");
-                    } catch (IOException e) {
-                        logger.warn("Could not read " + file.getName() + ": skipping.");
-                    }
+                    readWorkItemFromFile(file).ifPresent(result::add);
                 }
             }
         }
         return result;
+    }
+
+    private Optional<WorkItem> readWorkItemFromFile(File file) {
+        try {
+            String s = Files.readString(Path.of(file.getAbsolutePath()));
+            return Optional.of(mapper.readValue(s, WorkItem.class));
+        } catch (JacksonException je) {
+            logger.debug("File " + file.getName() + " does not correspond to valid DosisItem, skipped.");
+            return Optional.empty();
+        } catch (IOException e) {
+            logger.warn("Could not read " + file.getName() + ": skipping.");
+            return Optional.empty();
+        }
     }
 
     private Stream<File> streamOf(File[] files) {
@@ -191,11 +225,10 @@ public class DiskStore {
         }
     }
 
-
     private File createIfNotExists(String absoluteFolderName) {
         File file = new File(absoluteFolderName);
         if (!file.exists()) {
-            if (! file.mkdir()) {
+            if (!file.mkdir()) {
                 throw new RuntimeException("Problem creating folder: " + absoluteFolderName);
             }
         }

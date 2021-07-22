@@ -1,24 +1,23 @@
 package be.vlaio.dosis.connector.common;
 
 /**
- * The processing status of this item in the dosis connector. This is unrelated to the actual dosis status.
+ * De verwerkingsstatus van dit item in de dosisconnector. Deze status is ongerelateerd aan de dosis status.
  */
 public enum Verwerkingsstatus {
     /**
-     * The item is known by the DOSIS connector, but not yet submitted to DOSIS.
+     * Item is gekend bij de dosis connector, maar nog niet naar dosis verstuurd.
      */
     TODO,
     /**
-     * The item has been submitted to DOSIS, but no response has been received by DOSIS regarding the status update.
+     * Het item is verstuurd naar dosis, en daar aanvaard, maar er is nog geen validatie informatie beschikbaar.
      */
     UNVALIDATED,
     /**
-     * The item has been succesfully submitted to DOSIS and verified.
+     * Het item is succesvol doorgestuurd naar dosis en daar aanvaard.
      */
     COMPLETED,
     /**
-     * An attemp has been made by the connector to submit this item to DOSIS, but the item has been rejected or failed
-     * validation. This is a final state.
+     * Het item werd doorgestuurd naar dosis, maar is daar geweigerd door validatie fouten.
      */
     FAILED
 }

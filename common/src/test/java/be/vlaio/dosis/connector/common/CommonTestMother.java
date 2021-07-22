@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * Klasse om snel test data te genereren voor unittesten. Publieke methodes van deze klasse geven builders terug ipv
  * de reeds gebouwde objecten, zodat deze makkelijk in testen kunnen gewijzigd worden.
  */
-public class TestMother {
+public class CommonTestMother {
 
     private static final String[] steden = new String[] {"Brugge", "Antwerpen", "Gent", "Mechelen", "Lokeren", "Brussel"};
     private static final String[] straten = new String[] {"Bosplein", "Bondgenotenlaan", "Groenstraat", "Verzonnenlaan"};
@@ -82,7 +82,6 @@ public class TestMother {
                 .withDoorverwijzingsUrl("https://some.url.from." + random(domeinen) + "/with/some/id/" + RandomStringUtils.randomNumeric(4))
                 .withDossierNaam("Random dossiernaam " + r.nextInt(10))
                 .withDossierNummer(RandomStringUtils.randomAlphanumeric(10))
-                .withProcessingStatus(someVerwerkingsstatus())
                 .withDossierBeheerder(someContact().build())
                 .withId(UUID.randomUUID())
                 .withProduct(r.nextInt(10))
