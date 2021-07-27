@@ -2,6 +2,7 @@ package be.vlaio.dosis.connector.wip;
 
 import be.vlaio.dosis.connector.common.DosisItem;
 import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.WipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -180,5 +181,15 @@ public class WorkInProgress {
      */
     public int getNbItemsCompleted() {
         return finishedIds.size();
+    }
+
+    /**
+     * @return the status of the work in progress
+     */
+    public WipStatus getStatus() {
+        Map<Verwerkingsstatus, Integer> work = new HashMap<>();
+        items.forEach((status, items) -> work.put(status, items.size()));
+        return new WipStatus(work);
+
     }
 }

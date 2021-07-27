@@ -12,6 +12,6 @@ public class PusherCommandLineRunner implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		LOGGER.info("Hello from {}", this.getClass().getSimpleName());
+	//	LOGGER.info("Hello from {}", this.getClass().getSimpleName());
 	}
 }

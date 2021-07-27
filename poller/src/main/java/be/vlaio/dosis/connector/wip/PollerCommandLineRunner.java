@@ -3,6 +3,7 @@ package be.vlaio.dosis.connector.wip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,6 @@ public class PollerCommandLineRunner implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		LOGGER.info("Hello from {}", this.getClass().getSimpleName());
+	//	LOGGER.info("Hello from {}", this.getClass().getSimpleName());
 	}
 }

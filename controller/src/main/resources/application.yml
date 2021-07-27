@@ -1,0 +1,14 @@
+dosisgateway:
+  storagefolder: target
+  wip:
+    highwater: 5000
+    lowwater: 4000
+  poller:
+    delay: 150
+    instances:
+      -   name: dev
+          url: http://some.url/
+          sleeptime: 1000
+      -   name: test
+          url: http://some.test.url/
+          sleeptime: 500

@@ -1,9 +1,9 @@
-package be.vlaio.dosis.connector.wip;
+package be.vlaio.dosis.connector;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "be.vlaio.dosis.connector")
+@SpringBootApplication()
 public class DosisConnector {
 
 	public static void main(String[] args) {
