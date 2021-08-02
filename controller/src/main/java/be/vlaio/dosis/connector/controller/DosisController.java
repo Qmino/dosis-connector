@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.controller;
 
-import be.vlaio.dosis.connector.Poller;
+import be.vlaio.dosis.connector.poller.Poller;
 import be.vlaio.dosis.connector.common.DosisConnectorStatus;
 import be.vlaio.dosis.connector.common.PollerSpecification;
 import be.vlaio.dosis.connector.springconf.PollersConfiguration;

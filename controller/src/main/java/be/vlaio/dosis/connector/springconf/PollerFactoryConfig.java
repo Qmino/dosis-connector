@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.springconf;
 
-import be.vlaio.dosis.connector.Poller;
+import be.vlaio.dosis.connector.poller.Poller;
 import be.vlaio.dosis.connector.common.PollerSpecification;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

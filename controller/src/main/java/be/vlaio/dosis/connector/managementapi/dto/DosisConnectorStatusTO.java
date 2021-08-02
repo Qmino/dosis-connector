@@ -1,10 +1,8 @@
 package be.vlaio.dosis.connector.managementapi.dto;
 
 import be.vlaio.dosis.connector.common.DosisConnectorStatus;
-import be.vlaio.dosis.connector.wip.WorkInProgress;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,10 +31,6 @@ public class DosisConnectorStatusTO {
         public Builder() {
         }
 
-        public static Builder aDosisConnectorStatusTO() {
-            return new Builder();
-        }
-
         public Builder withPollers(List<PollerStatusTO> pollers) {
             this.pollers = pollers;
             return this;
@@ -54,9 +48,8 @@ public class DosisConnectorStatusTO {
                     .stream()
                     .map(ps -> new PollerStatusTO.Builder().from(ps).build())
                     .collect(Collectors.toList());
-            this.workInProgress = status.getWorkInProgress() == null
-                    ? new WipStatusTO(new HashMap<>()) :
-                    new WipStatusTO(status.getWorkInProgress().getItems());
+            this.workInProgress =
+                    new WipStatusTO.Builder().from(status.getWorkInProgress()).build();
             return this;
         }
 

@@ -189,7 +189,10 @@ public class WorkInProgress {
     public WipStatus getStatus() {
         Map<Verwerkingsstatus, Integer> work = new HashMap<>();
         items.forEach((status, items) -> work.put(status, items.size()));
-        return new WipStatus(work);
-
+        return new WipStatus.Builder()
+                .withHighWaterMark(this.highWater)
+                .withLowWaterMark(this.lowWater)
+                .withAcceptingWork(this.canAcceptMoreWork)
+                .withItems(work).build();
     }
 }

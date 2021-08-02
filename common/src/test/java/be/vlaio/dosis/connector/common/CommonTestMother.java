@@ -1,12 +1,14 @@
 package be.vlaio.dosis.connector.common;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -19,8 +21,16 @@ public class CommonTestMother {
     private static final String[] straten = new String[] {"Bosplein", "Bondgenotenlaan", "Groenstraat", "Verzonnenlaan"};
     private static final String[] personen = new String[] {"Jan", "Pieter", "Korneel", "Karel", "Karolien"};
     private static final String[] domeinen = new String[] {"gmail.com", "vlaanderen.be", "hotmail.com", "outlook.com"};
-    private static final Random r = new Random();
+    private static final String[] vlaamseFasen = new String[] {"Samenstelling", "Behandeling", "Beslissing", "Beroep", "Uitvoering", "Afgerond"};
+    private static final String[][] vlaamseCoden = new String[][] {
+            {"Geinitieerd", "Aangevraagd", "Ingediend"},
+            {"DossierOnvolledig", "DossierVolledig", "Ontvankelijk", "OnOntvankelijk", "InBehandeling", "KlaarVoorBeslissing"},
+            {"InWacht", "Beslist","Goedgekeurd", "Stopgezet", "Stopzetting","Geweigerd"},
+            {"InWacht", "Beslist","Goedgekeurd", "Stopgezet", "Stopzetting","Geweigerd"},
+            {"KlaarVoorBetaling","Betaald", "DeelsUitbetaald","Uitgevoerd"},
+            {"ErkendVergund","DeelsGoedgekeurd"}};
 
+    private static final Random r = new Random();
 
     public static Adres.Builder someAdres() {
         return new Adres.Builder()
@@ -58,18 +68,39 @@ public class CommonTestMother {
    public static Contact.Builder someContact() {
         return new Contact.Builder()
                 .withAdres(someAdres().build())
-                .withEmail(random(personen) + "@" + random(domeinen))
+                .withEmail(randomEmail())
                 .withTelefoon("+3249" + RandomStringUtils.randomNumeric(7))
-                .withWebsite("www." + random(domeinen))
+                .withWebsite("www." + randomDomein())
                 .withDienst("Dienst " + RandomStringUtils.randomNumeric(1));
    }
 
+   public static String randomPersoonNaam() {
+       return random(personen);
+   }
+
+   public static String randomDomein() {
+        return random(domeinen);
+   }
+
+   public static String randomEmail() {
+        return randomPersoonNaam() + "@" + randomDomein();
+   }
+
+   public static String randomStad() {
+        return random(steden);
+   }
+
+   public static String randomStraat() {
+        return random(steden);
+   }
+
    public static DossierStatus.Builder someDossierStatus() {
+        int fase = r.nextInt(6);
         return new DossierStatus.Builder()
                 .withActie("Actie nr " + r.nextInt(10))
                 .withDetail("Detail nr " + r.nextInt(10))
-                .withVlaamseCode("Vlaamse Code " + r.nextInt(10))
-                .withVlaamseFase("Vlaamse fase " + r.nextInt(10));
+                .withVlaamseCode(random(vlaamseCoden[fase]))
+                .withVlaamseFase(random(vlaamseFasen));
    }
 
    public static Verwerkingsstatus someVerwerkingsstatus() {
@@ -89,15 +120,22 @@ public class CommonTestMother {
                 .withStatus(someDossierStatus().build());
    }
 
-    private static <T> T random(T[] input) {
+    public static ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                .registerModule(new JavaTimeModule());
+    }
+
+    public static <T> T random(T[] input) {
         return input[r.nextInt(input.length)];
     }
 
-    private static <T> List<T> randomList(Supplier<T> generator) {
+    public static <T> List<T> randomList(Supplier<T> generator) {
         return random(r.nextInt(5), generator);
     }
 
-    private static <T> List<T> random(int size, Supplier<T> generator) {
+    public static <T> List<T> random(int size, Supplier<T> generator) {
         List<T> result = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             result.add(generator.get());

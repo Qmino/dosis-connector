@@ -5,7 +5,9 @@ import be.vlaio.dosis.connector.common.CommonTestMother;
 import be.vlaio.dosis.connector.common.Verwerkingsstatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @SuppressWarnings("ConstantConditions")
@@ -28,8 +32,8 @@ public class DiskStoreTest {
         store = new DiskStore(rootFolder.getAbsolutePath(),
                 new ObjectMapper()
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                         .registerModule(new JavaTimeModule()));
-
     }
 
     /**
@@ -148,6 +152,7 @@ public class DiskStoreTest {
         store = new DiskStore(rootFolder.getAbsolutePath() + File.separator + UUID.randomUUID(),
                 new ObjectMapper()
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
                         .registerModule(new JavaTimeModule()));
         basicStoreTest();
     }

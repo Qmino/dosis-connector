@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.wip;
+package be.vlaio.dosis.connector.poller;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.poller;
+package be.vlaio.dosis.connector.poller.dossierbeheersysteem;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;

@@ -1,13 +1,13 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ToegangsRecht.Builder.class)
-public class ToegangsRecht {
+@JsonDeserialize(builder = ToegangsRechtTO.Builder.class)
+public class ToegangsRechtTO {
     private final String recht;
     private final String context;
 
-    private ToegangsRecht(String recht, String context) {
+    private ToegangsRechtTO(String recht, String context) {
         this.recht = recht;
         this.context = context;
     }
@@ -34,8 +34,8 @@ public class ToegangsRecht {
             return this;
         }
 
-        public ToegangsRecht build() {
-            return new ToegangsRecht(this.recht, this.context);
+        public ToegangsRechtTO build() {
+            return new ToegangsRechtTO(this.recht, this.context);
         }
     }
 }
