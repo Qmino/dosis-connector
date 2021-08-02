@@ -45,7 +45,7 @@ public class StatusTO {
 
     @JsonPOJOBuilder
     public static final class Builder {
-        private String type;
+        private String type = "Status";
         private String vlaamseFase;
         private String vlaamseCode;
         private String detail;

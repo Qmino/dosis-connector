@@ -53,11 +53,28 @@ public class DossierbeheersysteemTOMother {
                         .withVolgendeVerzameling(dossierbeheerSysteemUrl+"?index=" + (index+aantalElementen) + "&limiet=" + limiet)
                         .withLimiet(limiet)
                         .withNieuweIndex(index+aantalElementen)
+                        .withType("StatusVeranderingsVerzameling")
                         .build());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
+
+    public static String someValidationError() {
+        return "{\n" +
+                "\t\"@type\": \"../errortype/1\",\n" +
+                "\t\"status\": 412,\n" +
+                "\t\"title\": \"Er waren validatie fouten\",\n" +
+                "\t\"errors\": [\n" +
+                "\t \t{ \n" +
+                "\t \t\"@type\": \"../errortype/2\",\n" +
+                "\t \t\"title\": \"De waarde is geen geldige waarde.\",\n" +
+                "\t \t\"detail\": \"De waarde moet tussen 0 en 100 liggen\"\n" +
+                "\t \t}\n" +
+                "\t]\n" +
+                "}";
+    }
+
 
     private static StatusTO.Builder someStatus() {
         int fase = random.nextInt(6);

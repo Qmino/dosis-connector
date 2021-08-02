@@ -3,12 +3,16 @@ package be.vlaio.dosis.connector.common;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class DossierStatusTest {
 
     @Test
+    @DisplayName("Jackson configuratie setup")
     public void deserializationTest() {
         String value = "{\n" +
                 "\t\"vlaamseCode\": \"Een vlaamse Code\",\n" +
@@ -20,12 +24,12 @@ public class DossierStatusTest {
         try {
             DossierStatus status = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .readValue(value, DossierStatus.class);
-            Assert.assertEquals("Een vlaamse Code", status.getVlaamseCode());
-            Assert.assertEquals("Een vlaamse fase", status.getVlaamseFase());
-            Assert.assertEquals("Een detail", status.getDetail());
-            Assert.assertEquals("Een actie", status.getActie());
+            assertEquals("Een vlaamse Code", status.getVlaamseCode());
+            assertEquals("Een vlaamse fase", status.getVlaamseFase());
+            assertEquals("Een detail", status.getDetail());
+            assertEquals("Een actie", status.getActie());
         } catch (JsonProcessingException e) {
-            Assert.fail("Kon niet deserializeren");
+            fail("Kon niet deserializeren");
         }
     }
 
