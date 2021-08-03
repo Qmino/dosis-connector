@@ -8,7 +8,7 @@ dosisgateway:
     instances:
       -   name: dev
           url: http://some.url/
-          sleeptime: 1000
+          itemlimit: 100
       -   name: test
           url: http://some.test.url/
-          sleeptime: 500
+          itemlimit: 100

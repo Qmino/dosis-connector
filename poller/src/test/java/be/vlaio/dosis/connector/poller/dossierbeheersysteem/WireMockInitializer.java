@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.test.context.event.AfterTestClassEvent;
 
 public class WireMockInitializer
         implements ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -19,7 +20,7 @@ public class WireMockInitializer
                 .registerSingleton("wireMockServer", wireMockServer);
 
         configurableApplicationContext.addApplicationListener(applicationEvent -> {
-            if (applicationEvent instanceof ContextClosedEvent) {
+            if (applicationEvent instanceof ContextClosedEvent || applicationEvent instanceof AfterTestClassEvent) {
                 wireMockServer.stop();
             }
         });

@@ -10,7 +10,6 @@ import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusTO;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,11 +27,13 @@ public class Poller {
     // Permanent items
     private final String baseUrl;
     private final String name;
+    private final int itemLimit;
+
     private final DossierbeheersysteemFetcher itemFetcher;
     // Current status
     private boolean active;
     private long lastProcessed;
-    private int nbItemsRetrieved;
+    private int nbItemsRetrievedSinceStart;
     private LocalDateTime lastFetched;
     private LocalDateTime lastRetrieved;
 
@@ -41,12 +42,15 @@ public class Poller {
      * @param spec the spec containing the name and base url of the poller
      */
     public Poller(PollerSpecification spec, WorkInProgress wip, DosisItemFactory dif) {
+        LOGGER.info("Initializing poller " + spec.getName());
         this.baseUrl = spec.getUrl();
         this.name = spec.getName();
+        this.itemLimit = spec.getItemLimit();
         this.itemFetcher = new DossierbeheersysteemFetcher(baseUrl);
         this.wip = wip;
         this.dif = dif;
         this.lastProcessed = wip.getLastIndexProcessed(this.name);
+        this.active = true;
     }
 
     /**
@@ -56,16 +60,23 @@ public class Poller {
      */
     @Scheduled(fixedDelayString = "${dosisgateway.poller.delay}")
     public void fetchItems() {
-        if (active && wip.readyToAcceptNewWork()) {
+        boolean runAgain = true;
+        while (active && runAgain && wip.readyToAcceptNewWork()) {
             try {
                 lastFetched = LocalDateTime.now();
-                DossierStatusCollectionTO fetched = itemFetcher.fetchItems(lastProcessed, 100);
-                nbItemsRetrieved += fetched.getElementen().size();
-                lastRetrieved = LocalDateTime.now();
+                DossierStatusCollectionTO fetched = itemFetcher.fetchItems(lastProcessed, itemLimit);
+                int nbElemsRetrieved = fetched.getElementen().size();
+                nbItemsRetrievedSinceStart += nbElemsRetrieved;
+                LOGGER.debug("Fetched " + nbElemsRetrieved + " elements.");
                 for (DossierStatusTO item: fetched.getElementen()) {
                     DosisItem element = dif.from(item);
                     wip.addNewDosisItem(element, name, item.getIndex());
                     lastProcessed = item.getIndex();
+                }
+                if (nbElemsRetrieved > 0) {
+                    lastRetrieved = LocalDateTime.now();
+                } else {
+                    runAgain = false;
                 }
             } catch (FetchException e) {
                 e.printStackTrace();
@@ -80,12 +91,12 @@ public class Poller {
 
     public PollerStatus getStatus() {
         return new PollerStatus.Builder()
-                .withActive(true)
+                .withActive(active)
                 .withName(name)
                 .withCurrentItem(lastProcessed)
-                .withLastPoll(lastRetrieved)
-                .withNbItemsRetrieved(nbItemsRetrieved)
-                .withLastElementRetrievedAt(lastFetched)
+                .withLastPoll(lastFetched)
+                .withNbItemsRetrieved(nbItemsRetrievedSinceStart)
+                .withLastElementRetrievedAt(lastRetrieved)
                 .build();
     }
 }

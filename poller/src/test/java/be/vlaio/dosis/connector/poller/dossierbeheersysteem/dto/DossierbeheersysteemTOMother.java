@@ -39,6 +39,7 @@ public class DossierbeheersysteemTOMother {
                     .withDossiernummer("TEST-" + UUID.randomUUID())
                     .withDoorverwijzingUrl(doorverwijzingUrl + getal)
                     .withStatus(someStatus().build())
+                    .withIndex(index+i)
                     .withProduct(random.nextInt(100))
                     .withDossierBeheerder(someContact().build())
                     .withAgenten(CommonTestMother.randomList(DossierbeheersysteemTOMother::someAgent))
