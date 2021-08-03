@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +35,8 @@ import java.util.stream.Stream;
 public class DiskStore {
 
     private final Logger logger = LoggerFactory.getLogger(DiskStore.class);
-    private final Map<Verwerkingsstatus, File> folders = new HashMap<>();
+    private final Map<Verwerkingsstatus, File> statusFolders = new HashMap<>();
+    private File pollerConfigFolder;
     private final ObjectMapper mapper;
 
     /**
@@ -44,7 +46,7 @@ public class DiskStore {
      *                   tracht de diskstore deze aan te maken. De applicatie moet moet schrijfrechten hebben in de
      *                   folder (of deze kunnen aanmaken), of de initialisatie van de component zal falen met een
      *                   exception.
-     * @param mapper de jackson json mapper voor serializatie en deserializatie van de objecten naar bestand.
+     * @param mapper     de jackson json mapper voor serializatie en deserializatie van de objecten naar bestand.
      */
     public DiskStore(@Value("${dosisgateway.storagefolder}") String rootFolder, ObjectMapper mapper) {
         this.mapper = mapper;
@@ -55,8 +57,9 @@ public class DiskStore {
         try {
             File root = createIfNotExists(rootFolder);
             File itemFolder = createIfNotExists(root, "items");
+            pollerConfigFolder = createIfNotExists(root, "pollerconfigs");
             for (Verwerkingsstatus status : Verwerkingsstatus.values()) {
-                folders.put(status, createIfNotExists(itemFolder, status.name().toLowerCase()));
+                statusFolders.put(status, createIfNotExists(itemFolder, status.name().toLowerCase()));
             }
         } catch (SecurityException se) {
             logger.error("Could not initialize diskwriter", se);
@@ -68,7 +71,7 @@ public class DiskStore {
      */
     public List<WorkItem> fetchAll() {
         List<WorkItem> result = new ArrayList<>();
-        for (File folder : folders.values()) {
+        for (File folder : statusFolders.values()) {
             result.addAll(readItems(folder));
         }
         return result;
@@ -80,7 +83,7 @@ public class DiskStore {
      */
     public List<WorkItem> fetchAllUncompleted() {
         List<WorkItem> result = new ArrayList<>();
-        for (Map.Entry<Verwerkingsstatus, File> entry: folders.entrySet()) {
+        for (Map.Entry<Verwerkingsstatus, File> entry : statusFolders.entrySet()) {
             if (entry.getKey() != Verwerkingsstatus.COMPLETED) {
                 result.addAll(readItems(entry.getValue()));
             }
@@ -90,11 +93,12 @@ public class DiskStore {
 
     /**
      * Haalt een workitem op met een gegeven id (indien dit bestaat).
+     *
      * @param id de gewenste id
      * @return Het gevraagde item indien het bestaat.
      */
     public Optional<WorkItem> fetchById(UUID id) {
-        for (File folder: folders.values()) {
+        for (File folder : statusFolders.values()) {
             File file = new File(folder.getAbsolutePath() + File.separator + id + ".json");
             if (file.exists()) {
                 return readWorkItemFromFile(file);
@@ -112,23 +116,22 @@ public class DiskStore {
     public void upsert(WorkItem item) {
         try {
             String json = mapper.writeValueAsString(item);
-            File folder = folders.get(item.getCurrentStatus());
+            File folder = statusFolders.get(item.getCurrentStatus());
             if (folder == null) {
                 // Zou nooit mogen gebeuren, aangezien dit betekent dat de component incorrect is geïnitialiseerd.
                 // We verkiezen ervoor een exception te gooien ipv data te verliezen.
                 throw new RuntimeException("Critical error: unable to store dosisitem with status: " +
                         item.getCurrentStatus());
             } else {
-                String fileName =  item.getDosisItem().getId() + ".json";
+                String fileName = item.getDosisItem().getId() + ".json";
                 writeToFile(json, folder.getAbsolutePath() + File.separator + fileName);
                 // Delete the file in all other statuses (if they exist) and collect those that can not be deleted!
-                List<File> problematicFiles = folders.values().stream()
+                List<File> problematicFiles = statusFolders.values().stream()
                         .filter(f -> f != folder)
                         .flatMap(f -> streamOf(f.listFiles((dir, name) -> name.equals(item.getDosisItem().getId() + ".json"))))
-                        .filter(f -> ! f.delete())
+                        .filter(f -> !f.delete())
                         .collect(Collectors.toList());
-                if (problematicFiles.size() > 0)
-                {
+                if (problematicFiles.size() > 0) {
                     throw new RuntimeException("Could not delete following files: " +
                             problematicFiles.stream().map(File::getName).collect(Collectors.joining(", ")));
                 }
@@ -142,8 +145,66 @@ public class DiskStore {
     }
 
     /**
+     * Slaat voor een gegegeven poller, het laatst afgehaalde en verwerkte element op.
+     *
+     * @param pollerName    de naam van de poller
+     * @param upstreamIndex de index die moet gesaved worden
+     * @param item het laatst verwerkte workitem
+     */
+    public void saveLastProcessedIndex(String pollerName, long upstreamIndex, WorkItem item) {
+        File pollerFile = new File(pollerConfigFolder.getAbsolutePath() + File.separator + pollerName + ".json");
+        try {
+            String json = mapper.writeValueAsString(
+                    new PollerConfig.Builder()
+                            .withLastId(item.getId())
+                            .withLastUpdate(LocalDateTime.now())
+                            .withPollerName(pollerName)
+                            .withLastIndex(upstreamIndex)
+                            .build()
+            );
+            writeToFile(json, pollerFile.getAbsolutePath());
+        } catch (JsonProcessingException e) {
+            logger.error("Unexpected JSON serizalization issue", e);
+        } catch (IOException e) {
+            logger.error("Kan pollerconfiguratie niet wegschrijven naar bestand: " + pollerFile.getAbsolutePath(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Vraagt voor een gegeven poller de laatst gekende index op. Indien voor de poller geen index
+     * gekend is, wordt 0 teruggegeven.
+     *
+     * @param pollerName de naam van de poller
+     * @return de index van het laatste element dat door de poller is geregistreerd.
+     */
+    public long getLastProcessedIndex(String pollerName) {
+        File pollerFile = new File(pollerConfigFolder.getAbsolutePath() + File.separator + pollerName + ".json");
+        if (! pollerFile.exists()) {
+            return -1L;
+        } else {
+            try {
+                String s = Files.readString(Path.of(pollerFile.getAbsolutePath()));
+                if (s == null || s.isBlank()) {
+                    return -1L;
+                }
+                PollerConfig conf = mapper.readValue(s, PollerConfig.class);
+                return conf == null ? 0 : conf.getLastIndex();
+            } catch (JacksonException je) {
+                logger.debug("Bestand " + pollerFile.getName() + " komt niet overeen met een geldige poller configuratie.");
+                return -1L;
+            } catch (IOException e) {
+                logger.warn("Kan bestand " + pollerFile.getName() + " niet lezen. Pollerconfiguratie overgeslagen.");
+                return -1L;
+            }
+        }
+    }
+
+
+    /**
      * Verwijdert het dosisitem van fysiek van de schijf, er wordt hierbij enkel gekeken naar de ID van het item, niet
      * naar de verwerkingsstatus.
+     *
      * @param item het te verwijderen item
      * @return of er effectief een bestand is verwijderd
      */
@@ -152,7 +213,7 @@ public class DiskStore {
         // Normaal staat het item in de folder van de verwerkingsstatus van het item.
         // Voor de zekerheid kijken we in alle folders.
         boolean result = false;
-        for (File folder: folders.values()) {
+        for (File folder : statusFolders.values()) {
             File bestand = new File(folder.getAbsolutePath() + relativeFileName);
             if (bestand.exists()) {
                 boolean deleted = bestand.delete();
@@ -164,16 +225,18 @@ public class DiskStore {
 
     /**
      * Geeft de folder waar items van de gegeven status worden opgeslagen.
+     *
      * @param status de status waar de locatie van de items voor opgevraagd wordt.
      * @return De folder waarin items van de gegeven status (zouden) worden opgeslagen (indien van toepassing).
      */
     public File getStorageFolder(Verwerkingsstatus status) {
-        return folders.get(status);
+        return statusFolders.get(status);
     }
 
     /**
      * Hulpmethode die een string naar een bestand schrijft. Indien het bestand al bestaat wordt het overschreven.
-     * @param toWrite de string die in het bestand moet worden geschreven.
+     *
+     * @param toWrite  de string die in het bestand moet worden geschreven.
      * @param fileName de volledige (absolute) naam van het bestand
      * @throws IOException indien er niet naar het bestand kan worden geschreven
      */
@@ -238,10 +301,11 @@ public class DiskStore {
     private File createIfNotExists(File parentFolder, String relativeSubfolderName) {
         File file = new File(parentFolder.getAbsolutePath() + File.separator + relativeSubfolderName);
         if (!file.exists()) {
-            if (! file.mkdir()) {
+            if (!file.mkdir()) {
                 throw new RuntimeException("Problem creating folder: " + file.getAbsolutePath());
             }
         }
         return file;
     }
+
 }

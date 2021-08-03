@@ -72,7 +72,7 @@ public class DossierbeheersysteemFetcher {
      * @return een dossierstatusverzameling, met daarin maximaal limiet aantal elementen
      * @throws FetchException indien er een probleem was en de resultaten niet konden worden opgehaald.
      */
-    public DossierStatusCollectionTO fetchItems(int index, int limiet) throws FetchException {
+    public DossierStatusCollectionTO fetchItems(long index, int limiet) throws FetchException {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
         HttpEntity<String> entity = new HttpEntity<>(headers);

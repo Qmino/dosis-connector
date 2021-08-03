@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 
 public class PollerStatusTO {
 
-    private int currentItem;
+    private long currentItem;
     private int nbItemsRetrieved;
     private boolean active;
     private LocalDateTime lastPoll;
     private LocalDateTime lastElementRetrievedAt;
 
-    public PollerStatusTO(int currentItem, int nbItemsRetrieved, boolean active,
+    public PollerStatusTO(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt) {
         this.currentItem = currentItem;
         this.nbItemsRetrieved = nbItemsRetrieved;
@@ -21,7 +21,7 @@ public class PollerStatusTO {
         this.lastElementRetrievedAt = lastElementRetrievedAt;
     }
 
-    public int getCurrentItem() {
+    public long getCurrentItem() {
         return currentItem;
     }
 
@@ -43,7 +43,7 @@ public class PollerStatusTO {
 
 
     public static final class Builder {
-        private int currentItem;
+        private long currentItem;
         private int nbItemsRetrieved;
         private boolean active;
         private LocalDateTime lastPoll;

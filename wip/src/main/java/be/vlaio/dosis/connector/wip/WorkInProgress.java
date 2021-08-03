@@ -87,9 +87,11 @@ public class WorkInProgress {
     /**
      * Voegt een nieuw item werk toe aan de WIP component.
      * @param newItem het toe te voegen element
+     * @param pollerName de naam van de poller die het element toevoegt
+     * @param upstreamIndex de upstream (dossierbeheersysteem) index van het toe te voegen element
      * @throws IllegalArgumentException indien de WIP component reeds een item werk kent met dezelfde id.
      */
-    public void addNewDosisItem(DosisItem newItem) throws IllegalArgumentException {
+    public void addNewDosisItem(DosisItem newItem, String pollerName, long upstreamIndex) throws IllegalArgumentException {
         if (! canAcceptMoreWork) {
             logger.debug("Still adding work although WIP component indicates it filling up.");
         }
@@ -99,10 +101,22 @@ public class WorkInProgress {
             WorkItem item = new WorkItem.Builder().withDosisItem(newItem).withCurrentStatus(Verwerkingsstatus.TODO).build();
             items.get(Verwerkingsstatus.TODO).add(item);
             currentIds.add(newItem.getId());
+            store.upsert(item);
             if (canAcceptMoreWork && getNumberOfItems() >= highWater) {
                 canAcceptMoreWork = false;
             }
+            store.saveLastProcessedIndex(pollerName, upstreamIndex, item);
         }
+    }
+
+    /**
+     * Geeft de index van het laatste element dat door de poller met de gegeven naam is geregistreerd bij de WIP.
+     * Indien er geen element geregisteerd is wordt -1 teruggegeven.
+     * @param pollerName de naam van de poller
+     * @return de index van het laatst verwerkte element afkomstig van de poller met de gegeven naam
+     */
+    public long getLastIndexProcessed(String pollerName) {
+        return store.getLastProcessedIndex(pollerName);
     }
 
     /**

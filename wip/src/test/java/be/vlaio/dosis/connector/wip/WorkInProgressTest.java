@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class WorkInProgressTest {
@@ -21,9 +23,11 @@ public class WorkInProgressTest {
     File rootFolder;
     DiskStore store;
     WorkInProgress wip;
+    String pollerNaam;
 
     @BeforeEach
     public void setup() {
+        pollerNaam = "pn";
         store = new DiskStore(rootFolder.getAbsolutePath(),
                 new ObjectMapper()
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -42,17 +46,25 @@ public class WorkInProgressTest {
         DosisItem sixth = CommonTestMother.someDosisItem().build();
 
         Assertions.assertTrue(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(first);  //1
+        Assertions.assertEquals(-1L, wip.getLastIndexProcessed(pollerNaam));
+        wip.addNewDosisItem(first, pollerNaam, 1L);  //1
+        Assertions.assertEquals(1L, wip.getLastIndexProcessed(pollerNaam));
+        Assertions.assertEquals(-1L, wip.getLastIndexProcessed("andere"));
         Assertions.assertTrue(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(second); //2
+        wip.addNewDosisItem(second, pollerNaam, 2L); //2
+        Assertions.assertEquals(2L, wip.getLastIndexProcessed(pollerNaam));
         Assertions.assertTrue(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(third);  //3
+        wip.addNewDosisItem(third, pollerNaam, 3L);  //3
+        Assertions.assertEquals(3L, wip.getLastIndexProcessed(pollerNaam));
         Assertions.assertTrue(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(fourth); //4
+        wip.addNewDosisItem(fourth, pollerNaam, 4L); //4
+        Assertions.assertEquals(4L, wip.getLastIndexProcessed(pollerNaam));
         Assertions.assertTrue(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(fifth);  //5
+        wip.addNewDosisItem(fifth, pollerNaam, 5L);  //5
+        Assertions.assertEquals(5L, wip.getLastIndexProcessed(pollerNaam));
         Assertions.assertFalse(wip.readyToAcceptNewWork());
-        wip.addNewDosisItem(sixth);  //6  We kunnen nog steeds toevoegen.
+        wip.addNewDosisItem(sixth, pollerNaam, 6L);  //6  We kunnen nog steeds toevoegen.
+        Assertions.assertEquals(6L, wip.getLastIndexProcessed(pollerNaam));
         Assertions.assertFalse(wip.readyToAcceptNewWork());
         wip.transitionItem(first, Verwerkingsstatus.COMPLETED);
         Assertions.assertFalse(wip.readyToAcceptNewWork()); //5
@@ -72,9 +84,9 @@ public class WorkInProgressTest {
         DosisItem third = CommonTestMother.someDosisItem().build();
         DosisItem sameAsFirst = CommonTestMother.someDosisItem().but().withId(first.getId()).build();
 
-        wip.addNewDosisItem(first);
+        wip.addNewDosisItem(first, pollerNaam, 0L);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            wip.addNewDosisItem(sameAsFirst);
+            wip.addNewDosisItem(sameAsFirst, pollerNaam, 0L);
         });
         Optional<DosisItem> retrieved = wip.getItemInState(Verwerkingsstatus.TODO);
         Assertions.assertTrue(retrieved.isPresent());
@@ -83,8 +95,9 @@ public class WorkInProgressTest {
         Assertions.assertFalse(wip.getItemInState(Verwerkingsstatus.UNVALIDATED).isPresent());
         Assertions.assertFalse(wip.getItemInState(Verwerkingsstatus.COMPLETED).isPresent());
         Assertions.assertEquals(0, wip.getNbItemsCompleted());
+        Assertions.assertTrue(store.fetchById(first.getId()).isPresent());
 
-        wip.addNewDosisItem(second);
+        wip.addNewDosisItem(second, pollerNaam, 1L);
         retrieved = wip.getItemInState(Verwerkingsstatus.TODO);
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(first, retrieved.get());
@@ -117,5 +130,4 @@ public class WorkInProgressTest {
             wip.transitionItem(third, Verwerkingsstatus.COMPLETED);
         });
     }
-
 }

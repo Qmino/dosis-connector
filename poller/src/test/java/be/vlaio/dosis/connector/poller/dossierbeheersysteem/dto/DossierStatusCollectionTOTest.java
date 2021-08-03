@@ -22,6 +22,7 @@ public class DossierStatusCollectionTOTest {
                 "  \"elementen\": [\n" +
                 "    {\n" +
                 "      \"@type\": \"DossierStatus\",\n" +
+                "      \"index\": 1,\n" +
                 "      \"dossiernummer\": \"ASTAD-2021-177839\",\n" +
                 "      \"dossiernaam\": \"Melden nieuwe zaak & aanvraag ondernemingsvergunning\",\n" +
                 "      \"doorverwijzingUrl\": \"https://eloket-a.antwerpen.be/nl/eloket/mijnloket/aanvraag/608927617b5f7704350e3c3b?type=company\",\n" +

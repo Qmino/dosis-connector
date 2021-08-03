@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 
 public class PollerStatus {
 
-    private final int currentItem;
+    private final long currentItem;
     private final int nbItemsRetrieved;
     private final boolean active;
     private String name;
     private final LocalDateTime lastPoll;
     private final LocalDateTime lastElementRetrievedAt;
 
-    public PollerStatus(int currentItem, int nbItemsRetrieved, boolean active,
+    public PollerStatus(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,
                         String name) {
         this.currentItem = currentItem;
@@ -22,7 +22,7 @@ public class PollerStatus {
         this.name = name;
     }
 
-    public int getCurrentItem() {
+    public long getCurrentItem() {
         return currentItem;
     }
 
@@ -48,14 +48,14 @@ public class PollerStatus {
 
 
     public static final class Builder {
-        private int currentItem;
+        private long currentItem;
         private int nbItemsRetrieved;
         private boolean active;
         private String name;
         private LocalDateTime lastPoll;
         private LocalDateTime lastElementRetrievedAt;
 
-        public Builder withCurrentItem(int currentItem) {
+        public Builder withCurrentItem(long currentItem) {
             this.currentItem = currentItem;
             return this;
         }

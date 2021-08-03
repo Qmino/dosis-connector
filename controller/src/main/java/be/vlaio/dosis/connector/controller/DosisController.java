@@ -1,5 +1,6 @@
 package be.vlaio.dosis.connector.controller;
 
+import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
 import be.vlaio.dosis.connector.common.DosisConnectorStatus;
 import be.vlaio.dosis.connector.common.PollerSpecification;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,9 +28,11 @@ public class DosisController implements CommandLineRunner {
 	@Autowired
 	private PollersConfiguration props;
 	@Autowired
-	private Function<PollerSpecification, Poller> pollerFactory;
+	private Function<PollerSpecification, BiFunction<WorkInProgress, DosisItemFactory, Poller>> pollerFactory;
 	@Autowired
 	private WorkInProgress wip;
+	@Autowired
+	private DosisItemFactory dosisItemFactory;
 
 	private Map<String, Poller> activePollers = new HashMap<>();
 
@@ -37,14 +41,14 @@ public class DosisController implements CommandLineRunner {
 		for (PollerSpecification spec: props.getInstances()) {
 			if (!activePollers.containsKey(spec.getName())) {
 				LOGGER.info("Starting poller from config-file: " + spec.getName());
-				activePollers.put(spec.getName(), pollerFactory.apply(spec));
+				activePollers.put(spec.getName(), pollerFactory.apply(spec).apply(wip, dosisItemFactory));
 			}
 		}
 	}
 
 	public DosisConnectorStatus getStatus() {
 		return new DosisConnectorStatus.Builder()
-				.withPollers(activePollers.values().stream().map(p->p.getStatus()).collect(Collectors.toList()))
+				.withPollers(activePollers.values().stream().map(Poller::getStatus).collect(Collectors.toList()))
 				.withWorkInProgress(wip.getStatus())
 				.build();
 	}

@@ -22,6 +22,11 @@ public class DossierStatusTO {
     private final ContactTO dossierBeheerder;
     private final List<AgentTO> agenten;
     private final int product;
+    private final long index;
+
+    public long getIndex() {
+        return index;
+    }
 
     public String getType() {
         return type;
@@ -61,7 +66,7 @@ public class DossierStatusTO {
 
     public DossierStatusTO(String type, String dossiernummer, String dossiernaam, String doorverwijzingUrl,
                            LocalDateTime wijzigingsdatum, StatusTO status, ContactTO dossierBeheerder,
-                           List<AgentTO> agenten, int product) {
+                           List<AgentTO> agenten, int product, long index) {
         this.type = type;
         this.dossiernummer = dossiernummer;
         this.dossiernaam = dossiernaam;
@@ -71,6 +76,7 @@ public class DossierStatusTO {
         this.dossierBeheerder = dossierBeheerder;
         this.agenten = agenten;
         this.product = product;
+        this.index = index;
     }
 
 
@@ -85,6 +91,7 @@ public class DossierStatusTO {
         private ContactTO dossierBeheerder;
         private List<AgentTO> agenten;
         private int product;
+        private long index;
 
         public Builder() {
         }
@@ -131,6 +138,11 @@ public class DossierStatusTO {
             return this;
         }
 
+        public Builder withIndex(long index) {
+            this.index = index;
+            return this;
+        }
+
         public Builder withProduct(int product) {
             this.product = product;
             return this;
@@ -139,6 +151,7 @@ public class DossierStatusTO {
         public Builder but() {
             return new Builder()
                     .withType(type)
+                    .withIndex(index)
                     .withDossiernummer(dossiernummer)
                     .withDossiernaam(dossiernaam)
                     .withDoorverwijzingUrl(doorverwijzingUrl)
@@ -151,7 +164,7 @@ public class DossierStatusTO {
 
         public DossierStatusTO build() {
             return new DossierStatusTO(type, dossiernummer, dossiernaam, doorverwijzingUrl, wijzigingsdatum,
-                    status, dossierBeheerder, agenten, product);
+                    status, dossierBeheerder, agenten, product, index);
         }
     }
 }
