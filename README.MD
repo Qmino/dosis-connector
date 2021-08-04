@@ -53,8 +53,12 @@ container worden opgestart:
 ```
 cd dbssim
 docker build -t vlaio/dbssim .
-docker run -p 8080:8080 vlaio/dbssim
+docker run -p 29090:8080 vlaio/dbssim
 ```
+
+In dit geval zal de simulator draaien op poort 29090. De simulator simuleert twee services:
+* /dossierstatusveranderingen: deze geeft een correcte respons terug
+* /fout/dossierstatusveranderingen: deze simuleert steeds een internal server error
 
 ## Opbouw van de dosis-connector
 

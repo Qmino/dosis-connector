@@ -10,16 +10,18 @@ public class PollerStatus {
     private String name;
     private final LocalDateTime lastPoll;
     private final LocalDateTime lastElementRetrievedAt;
+    private String lastResponse;
 
     public PollerStatus(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,
-                        String name) {
+                        String name, String lastResponse) {
         this.currentItem = currentItem;
         this.nbItemsRetrieved = nbItemsRetrieved;
         this.active = active;
         this.lastPoll = lastPoll;
         this.lastElementRetrievedAt = lastElementRetrievedAt;
         this.name = name;
+        this.lastResponse = lastResponse;
     }
 
     public long getCurrentItem() {
@@ -46,6 +48,9 @@ public class PollerStatus {
         return lastElementRetrievedAt;
     }
 
+    public String getLastResponse() {
+        return lastResponse;
+    }
 
     public static final class Builder {
         private long currentItem;
@@ -54,6 +59,7 @@ public class PollerStatus {
         private String name;
         private LocalDateTime lastPoll;
         private LocalDateTime lastElementRetrievedAt;
+        private String lastResponse;
 
         public Builder withCurrentItem(long currentItem) {
             this.currentItem = currentItem;
@@ -75,7 +81,6 @@ public class PollerStatus {
             return this;
         }
 
-
         public Builder withLastPoll(LocalDateTime lastPoll) {
             this.lastPoll = lastPoll;
             return this;
@@ -86,8 +91,14 @@ public class PollerStatus {
             return this;
         }
 
+        public Builder withLastResponse(String response) {
+            this.lastResponse = response;
+            return this;
+        }
+
         public PollerStatus build() {
-            return new PollerStatus(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt, name);
+            return new PollerStatus(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt,
+                    name, lastResponse);
         }
     }
 }

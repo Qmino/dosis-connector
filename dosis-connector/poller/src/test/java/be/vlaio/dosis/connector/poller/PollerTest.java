@@ -120,8 +120,8 @@ public class PollerTest {
         assertEquals(4, status.getNbItemsRetrieved());
         Assertions.assertTrue(status.getLastElementRetrievedAt().isAfter(before));
         Assertions.assertTrue(status.getLastElementRetrievedAt().isBefore(after));
-        Assertions.assertTrue(status.getLastPoll().isAfter(before));
-        Assertions.assertTrue(status.getLastPoll().isBefore(after));
+        Assertions.assertTrue(status.getLastPoll().isAfter(before) || status.getLastPoll().isEqual(before));
+        Assertions.assertTrue(status.getLastPoll().isBefore(after) || status.getLastPoll().isEqual(after));
 
         LocalDateTime elementRetrievedAt = status.getLastElementRetrievedAt();
         LocalDateTime newBefore = LocalDateTime.now();
@@ -134,8 +134,8 @@ public class PollerTest {
         assertEquals(3, status.getCurrentItem());
         assertEquals(4, status.getNbItemsRetrieved());
         Assertions.assertEquals(elementRetrievedAt, status.getLastElementRetrievedAt());
-        Assertions.assertTrue(status.getLastPoll().isAfter(newBefore));
-        Assertions.assertTrue(status.getLastPoll().isBefore(newAfter));
+        Assertions.assertTrue(status.getLastPoll().isAfter(newBefore) || status.getLastPoll().isEqual(newBefore));
+        Assertions.assertTrue(status.getLastPoll().isBefore(newAfter) || status.getLastPoll().isEqual(newAfter));
 
         poller.fetchItems(); // vijfde call: 0 items
         assertEquals(4, wip.getStatus().getItems().get(Verwerkingsstatus.TODO));

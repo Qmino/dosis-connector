@@ -11,14 +11,17 @@ public class PollerStatusTO {
     private boolean active;
     private LocalDateTime lastPoll;
     private LocalDateTime lastElementRetrievedAt;
+    private String lastResult;
 
     public PollerStatusTO(long currentItem, int nbItemsRetrieved, boolean active,
-                          LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt) {
+                          LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,
+                          String lastResult) {
         this.currentItem = currentItem;
         this.nbItemsRetrieved = nbItemsRetrieved;
         this.active = active;
         this.lastPoll = lastPoll;
         this.lastElementRetrievedAt = lastElementRetrievedAt;
+        this.lastResult = lastResult;
     }
 
     public long getCurrentItem() {
@@ -41,6 +44,9 @@ public class PollerStatusTO {
         return lastElementRetrievedAt;
     }
 
+    public String getLastResult() {
+        return lastResult;
+    }
 
     public static final class Builder {
         private long currentItem;
@@ -48,9 +54,15 @@ public class PollerStatusTO {
         private boolean active;
         private LocalDateTime lastPoll;
         private LocalDateTime lastElementRetrievedAt;
+        private String lastResult;
 
         public Builder withCurrentItem(int currentItem) {
             this.currentItem = currentItem;
+            return this;
+        }
+
+        public Builder withLastResult(String string) {
+            this.lastResult = lastResult;
             return this;
         }
 
@@ -80,11 +92,13 @@ public class PollerStatusTO {
             this.lastPoll = status.getLastPoll();
             this.lastElementRetrievedAt = status.getLastElementRetrievedAt();
             this.nbItemsRetrieved = status.getNbItemsRetrieved();
+            this.lastResult = status.getLastResponse();
             return this;
         }
 
         public PollerStatusTO build() {
-            return new PollerStatusTO(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt);
+            return new PollerStatusTO(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt,
+                    lastResult);
         }
     }
 }

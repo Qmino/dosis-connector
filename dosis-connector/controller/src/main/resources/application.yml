@@ -7,8 +7,8 @@ dosisgateway:
     delay: 150
     instances:
       -   name: dev
-          url: http://some.url/
+          url: http://localhost:29090/
           itemlimit: 100
-      -   name: test
-          url: http://some.test.url/
+      -   name: fout
+          url: http://localhost:29090/fout
           itemlimit: 100

@@ -40,8 +40,9 @@ public class DbSimService {
             nieuweIndex = list.size();
             elementen = new ArrayList<>();
         } else {
+            int from = Math.max(0, index);
             int to = Math.min(list.size()-1, index+limiet);
-            elementen = list.subList(index, to);
+            elementen = list.subList(from, to);
             nieuweIndex = to;
         }
         return new DossierStatusCollectionTO.Builder()
@@ -54,6 +55,13 @@ public class DbSimService {
                 .withId(UUID.randomUUID().toString()).build();
     }
 
+    @GetMapping(value="fout/dossierstatusveranderingen", produces="application/json")
+    @ResponseBody
+    public DossierStatusCollectionTO getErrorStatus(
+            @RequestParam("index") int index,
+            @RequestParam("limiet") int limiet) {
+        throw new NullPointerException("Internal server error triggeren :)");
+    }
 
 
     private DossierStatusTO someDossierStatusTO() {

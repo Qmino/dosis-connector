@@ -102,10 +102,10 @@ public class DossierbeheersysteemFetcher {
                 if (HttpStatus.valueOf(rcre.getRawStatusCode()).is4xxClientError()) {
                     throw new FetchException("", null, ServiceError.CLIENT_ERROR, exchange);
                 } else if (HttpStatus.valueOf(rcre.getRawStatusCode()).is5xxServerError()) {
-                    throw new FetchException("", null, ServiceError.SERVER_ERROR, exchange);
+                    throw new FetchException(rce.getMessage(), null, ServiceError.SERVER_ERROR, exchange);
                 } else {
                     // No idea how this can happen.
-                    throw new FetchException("", null, ServiceError.UNKNOWN, exchange);
+                    throw new FetchException(rce.getMessage(), null, ServiceError.UNKNOWN, exchange);
                 }
             } else if (rce.getMessage() != null && rce.getMessage().toLowerCase().contains("timeout")) {
                 throw new FetchException(rce.getMessage(), rce, ServiceError.TIMEOUT, exchange);

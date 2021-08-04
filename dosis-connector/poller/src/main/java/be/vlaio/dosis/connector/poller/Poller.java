@@ -33,16 +33,19 @@ public class Poller {
     // Current status
     private boolean active;
     private long lastProcessed;
+    private int consecutiveErrors = 0;
+    private int skips = 0;
     private int nbItemsRetrievedSinceStart;
     private LocalDateTime lastFetched;
     private LocalDateTime lastRetrieved;
+    private String lastResponse;
 
     /**
      * Creates a new poller based on a pollerspecification
      * @param spec the spec containing the name and base url of the poller
      */
     public Poller(PollerSpecification spec, WorkInProgress wip, DosisItemFactory dif) {
-        LOGGER.info("Initializing poller " + spec.getName());
+        info("Opstart");
         this.baseUrl = spec.getUrl();
         this.name = spec.getName();
         this.itemLimit = spec.getItemLimit();
@@ -61,13 +64,18 @@ public class Poller {
     @Scheduled(fixedDelayString = "${dosisgateway.poller.delay}")
     public void fetchItems() {
         boolean runAgain = true;
-        while (active && runAgain && wip.readyToAcceptNewWork()) {
+        while (active && runAgain && wip.readyToAcceptNewWork()
+                && skips >= 10 * consecutiveErrors * consecutiveErrors * consecutiveErrors
+        ) {
             try {
+                skips = 0;
                 lastFetched = LocalDateTime.now();
                 DossierStatusCollectionTO fetched = itemFetcher.fetchItems(lastProcessed, itemLimit);
+                consecutiveErrors = 0;
                 int nbElemsRetrieved = fetched.getElementen().size();
                 nbItemsRetrievedSinceStart += nbElemsRetrieved;
-                LOGGER.debug("Fetched " + nbElemsRetrieved + " elements.");
+                lastResponse = nbElemsRetrieved + " succesvol opgehaald.";
+                info(lastResponse);
                 for (DossierStatusTO item: fetched.getElementen()) {
                     DosisItem element = dif.from(item);
                     wip.addNewDosisItem(element, name, item.getIndex());
@@ -79,8 +87,17 @@ public class Poller {
                     runAgain = false;
                 }
             } catch (FetchException e) {
-                e.printStackTrace();
+                lastResponse = "Fout bij ophalen elementen van dossierbeheersysteem: " + e.getMessage();
+                info(lastResponse);
+                consecutiveErrors++;
+                if (consecutiveErrors > 3) {
+                    info("Permanente deactivatie wegens teveel fouten. Heractivatie manueel mogelijk.");
+                    active = false;
+                }
             }
+        }
+        if (consecutiveErrors > 0) {
+            skips++;
         }
     }
 
@@ -88,6 +105,9 @@ public class Poller {
         this.active = active;
     }
 
+    private void info(String s) {
+        LOGGER.info("Poller " + name + ": " + s);
+    }
 
     public PollerStatus getStatus() {
         return new PollerStatus.Builder()
@@ -97,6 +117,7 @@ public class Poller {
                 .withLastPoll(lastFetched)
                 .withNbItemsRetrieved(nbItemsRetrievedSinceStart)
                 .withLastElementRetrievedAt(lastRetrieved)
+                .withLastResponse(lastResponse)
                 .build();
     }
 }
