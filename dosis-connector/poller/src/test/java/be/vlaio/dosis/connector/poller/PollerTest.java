@@ -3,10 +3,7 @@ package be.vlaio.dosis.connector.poller;
 import be.vlaio.dosis.connector.common.PollerSpecification;
 import be.vlaio.dosis.connector.common.PollerStatus;
 import be.vlaio.dosis.connector.common.Verwerkingsstatus;
-import be.vlaio.dosis.connector.poller.dossierbeheersysteem.DossierbeheersysteemFetcher;
-import be.vlaio.dosis.connector.poller.dossierbeheersysteem.FetchException;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.WireMockInitializer;
-import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusCollectionTO;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierbeheersysteemTOMother;
 import be.vlaio.dosis.connector.wip.DiskStore;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
@@ -22,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -31,7 +27,8 @@ import java.util.function.Function;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"dosisgateway.poller.delay=200"})
 @ContextConfiguration(initializers = {WireMockInitializer.class})
@@ -125,9 +122,9 @@ public class PollerTest {
         Assertions.assertTrue(status.getLastElementRetrievedAt().isBefore(after));
         Assertions.assertTrue(status.getLastPoll().isAfter(before));
         Assertions.assertTrue(status.getLastPoll().isBefore(after));
+
         LocalDateTime elementRetrievedAt = status.getLastElementRetrievedAt();
         LocalDateTime newBefore = LocalDateTime.now();
-
         poller.fetchItems(); // vierde call: 0 items
         LocalDateTime newAfter = LocalDateTime.now();
         assertEquals(4, wip.getStatus().getItems().get(Verwerkingsstatus.TODO));

@@ -31,20 +31,10 @@ public class DossierbeheersysteemTOMother {
             {"ErkendVergund","DeelsGoedgekeurd"}};
 
     public static String someDossierStatusCollectionTO(int index, int limiet, int aantalElementen)  {
-        int getal = counter++;
+        counter++;
         List<DossierStatusTO> dossierStatussen = new ArrayList<>();
         for (int i = 0; i < aantalElementen; i++) {
-            dossierStatussen.add(new DossierStatusTO.Builder()
-                    .withDossiernaam("Testdossier " + getal)
-                    .withDossiernummer("TEST-" + UUID.randomUUID())
-                    .withDoorverwijzingUrl(doorverwijzingUrl + getal)
-                    .withStatus(someStatus().build())
-                    .withIndex(index+i)
-                    .withProduct(random.nextInt(100))
-                    .withDossierBeheerder(someContact().build())
-                    .withAgenten(CommonTestMother.randomList(DossierbeheersysteemTOMother::someAgent))
-                    .withWijzigingsdatum(LocalDateTime.now().minusDays(random.nextInt(50)))
-                    .build());
+            dossierStatussen.add(someDossierStatus().withIndex(index + i).build());
         }
 
         try {
@@ -59,6 +49,19 @@ public class DossierbeheersysteemTOMother {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static DossierStatusTO.Builder someDossierStatus() {
+        return new DossierStatusTO.Builder()
+                .withDossiernaam("Testdossier " + counter)
+                .withDossiernummer("TEST-" + UUID.randomUUID())
+                .withDoorverwijzingUrl(doorverwijzingUrl + counter)
+                .withStatus(someStatus().build())
+                .withIndex(counter)
+                .withProduct(random.nextInt(100))
+                .withDossierBeheerder(someContact().build())
+                .withAgenten(CommonTestMother.randomList(DossierbeheersysteemTOMother::someAgent))
+                .withWijzigingsdatum(LocalDateTime.now().minusDays(random.nextInt(50)));
     }
 
     public static String someValidationError() {
