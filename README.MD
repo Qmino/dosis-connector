@@ -68,6 +68,75 @@ Conceptueel wordt de dosis-connector voorgesteld door volgend schema:
 
 ## Componenten
 ### De Poller
+
+De poller(s) worden in de configuratiefile geconfigureerd onder de ```poller``` sectie die er uitziet als volgt:
+```
+  poller:
+    delay: 150
+    instances:
+      -   name: dev
+          url: http://localhost:29090/
+          itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 10
+      -   name: fout
+          url: http://localhost:29090/fout
+          itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 3
+```
+#### Poll-gedrag
+De poller haalt de items op bij het dossierbeheersysteem in batches die maximaal ```itemlimit``` groot zijn (geconfigureerd per poller). Zolang het dossierbeheersysteem nieuwe elementen teruggeeft, blijft de actie van de poller lopen en zal deze onmiddellijk opnieuw bijkomende elementen opvragen. Dit om achterstand snel weg te werken. Een poller begint steeds bij index 0, en de nieuwe index wordt berekend op basis van het index veld van het laatst verwerkte element. M.a.w. als het dossierbeheersysteem na een oproep van de poller (index 0, limit 10) twee elementen teruggeeft met indexen 3405 en 3409, zal de poller zijn volgende oproep beginnen bij 3410. **Het is dus heel belangrijk dat het dossierbeheersysteem elementen in volgorde van index teruggeeft!**
+
+Vanaf de poller in een oproep geen nieuwe elementen binnenkrijgt, wacht hij een bepaalde tijd alvorens opnieuw te proberen. Deze tijd wordt bepaald in de globale parameter ```delay```. De ```delay``` parameter is globaal gedeeld door de pollers. De tijd begint te tellen nadat de poller zijn vorige taak heeft afgerond.
+
+#### Exponential backoff
+
+Indien er een fout optreedt bij de communicatie naar het dossierbeheersysteem, implementeert Poller een exponential backoff principe, waarbij de poller steeds langer wacht om opnieuw te proberen tot deze uiteindelijk zichzelf permanent deactiveert. Dit gedrag wordt geconfigureerd door 3 parameters: ```backoffBase```, ```backoffExponent``` en ```backoffMaxRetries```. 
+
+Poller slaat bij een fout de volgende *n* polls over, waarbij *n* gelijk is aan: 
+
+```
+                      backoffExponent
+backoffBase  *  errors               
+```
+
+In bovenstaande formule is ```errors``` het aantal opeenvolgende fouten dat de poller bij de service is tegengekomen. Vanaf dit aantal ```backoffMaxRetries``` overschrijdt zal de poller niet meer pollen naar de service tot deze wordt gereactiveerd. 
+
+#### Voorbeeld
+
+Als de poller geconfigureerd is als volgt:
+
+```
+  poller:
+    delay: 5000
+    instances:
+      -   name: voorbeeld
+          url: http://localhost:29090/
+          itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 10
+```
+
+Bij terugkerende fouten aan het dossierbeheersysteem zal de poller als volgt opnieuw proberen:
+
+* 1e retry na 50 seconden
+* 2e retry na 6 minuten
+* 3e retry na 22 minuten
+* 4e retry na 53 minuten
+* 5e retry na 1u 44 minuten
+* 6e retry na 3u
+* 7e retry na 4u 20 min
+* 8e retry na 7u 6 min
+* 9e retry na 10u
+* 10e retry na 13u 30 min
+
+Als die 10e retry dan ook gefaald is deactiveert de poller zich permanent
+
+
 ### De Controller
 ### De Pusher
 ### De Validator

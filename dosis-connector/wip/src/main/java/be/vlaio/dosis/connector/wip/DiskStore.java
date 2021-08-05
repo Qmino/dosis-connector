@@ -53,7 +53,6 @@ public class DiskStore {
         if (rootFolder == null || rootFolder.trim().isEmpty()) {
             rootFolder = System.getProperty("user.dir");
         }
-        logger.info("Initializing diskstore in " + rootFolder);
         try {
             File root = createIfNotExists(rootFolder);
             File itemFolder = createIfNotExists(root, "items");
@@ -61,8 +60,9 @@ public class DiskStore {
             for (Verwerkingsstatus status : Verwerkingsstatus.values()) {
                 statusFolders.put(status, createIfNotExists(itemFolder, status.name().toLowerCase()));
             }
+            logger.info("Diskstore geïnitialiseerd in " + root.getAbsolutePath());
         } catch (SecurityException se) {
-            logger.error("Could not initialize diskwriter", se);
+            logger.error("Probleem bij initializatie van de diskwriter", se);
         }
     }
 
@@ -120,8 +120,8 @@ public class DiskStore {
             if (folder == null) {
                 // Zou nooit mogen gebeuren, aangezien dit betekent dat de component incorrect is geïnitialiseerd.
                 // We verkiezen ervoor een exception te gooien ipv data te verliezen.
-                throw new RuntimeException("Critical error: unable to store dosisitem with status: " +
-                        item.getCurrentStatus());
+                throw new RuntimeException("Kritische fout: kan dosisitem met status: " +
+                        item.getCurrentStatus() + " niet opslaan.");
             } else {
                 String fileName = item.getDosisItem().getId() + ".json";
                 writeToFile(json, folder.getAbsolutePath() + File.separator + fileName);
@@ -132,14 +132,14 @@ public class DiskStore {
                         .filter(f -> !f.delete())
                         .collect(Collectors.toList());
                 if (problematicFiles.size() > 0) {
-                    throw new RuntimeException("Could not delete following files: " +
+                    throw new RuntimeException("Volgende bestanden konden niet verwijderd worden: " +
                             problematicFiles.stream().map(File::getName).collect(Collectors.joining(", ")));
                 }
             }
         } catch (JsonProcessingException e) {
-            logger.error("Unexpected JSON serizalization issue", e);
+            logger.error("Onverwachtte JSON serizalizatie fout", e);
         } catch (IOException e) {
-            logger.error("Unable to write item " + item.getDosisItem().getId() + " to file.", e);
+            logger.error("Kan dosisitem " + item.getDosisItem().getId() + " niet wegschrijven naar bestand.", e);
             throw new RuntimeException(e);
         }
     }
@@ -164,7 +164,7 @@ public class DiskStore {
             );
             writeToFile(json, pollerFile.getAbsolutePath());
         } catch (JsonProcessingException e) {
-            logger.error("Unexpected JSON serizalization issue", e);
+            logger.error("Onverwachtte JSON serializatie fout", e);
         } catch (IOException e) {
             logger.error("Kan pollerconfiguratie niet wegschrijven naar bestand: " + pollerFile.getAbsolutePath(), e);
             throw new RuntimeException(e);
@@ -272,10 +272,10 @@ public class DiskStore {
             String s = Files.readString(Path.of(file.getAbsolutePath()));
             return Optional.of(mapper.readValue(s, WorkItem.class));
         } catch (JacksonException je) {
-            logger.debug("File " + file.getName() + " does not correspond to valid DosisItem, skipped.");
+            logger.debug("Bestand " + file.getName() + " komt niet overeen met een geldig DosisItem, overgeslagen.");
             return Optional.empty();
         } catch (IOException e) {
-            logger.warn("Could not read " + file.getName() + ": skipping.");
+            logger.warn("Kan bestand " + file.getName() + " niet lezen: overgeslagen.");
             return Optional.empty();
         }
     }
@@ -292,7 +292,7 @@ public class DiskStore {
         File file = new File(absoluteFolderName);
         if (!file.exists()) {
             if (!file.mkdir()) {
-                throw new RuntimeException("Problem creating folder: " + absoluteFolderName);
+                throw new RuntimeException("Probleem bij aanmaak folder: " + absoluteFolderName);
             }
         }
         return file;
@@ -302,7 +302,7 @@ public class DiskStore {
         File file = new File(parentFolder.getAbsolutePath() + File.separator + relativeSubfolderName);
         if (!file.exists()) {
             if (!file.mkdir()) {
-                throw new RuntimeException("Problem creating folder: " + file.getAbsolutePath());
+                throw new RuntimeException("Probleem bij aanmaak folder: " + file.getAbsolutePath());
             }
         }
         return file;

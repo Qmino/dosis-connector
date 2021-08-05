@@ -47,7 +47,13 @@ public class PollerTest {
 
     @BeforeEach()
     public void before() {
-        PollerSpecification ps = new PollerSpecification("testpoller", "http://localhost:9090", 2);
+        PollerSpecification ps = new PollerSpecification(
+                "testpoller",
+                "http://localhost:9090",
+                2,
+                10,
+                3,
+                3);
         DiskStore store = new DiskStore(rootFolder.getAbsolutePath(),
                 new ObjectMapper()
                         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -63,7 +69,7 @@ public class PollerTest {
 
     @Test
     @DisplayName("Basis fetch scenario")
-    void testGetStatusveranderingen() throws InterruptedException {
+    void testGetStatusveranderingen() {
         // Eerste call: 2 elementen
         this.wireMockServer.stubFor(
                 WireMock.get(urlPathEqualTo("/dossierstatusveranderingen"))

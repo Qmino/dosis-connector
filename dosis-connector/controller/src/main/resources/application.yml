@@ -9,6 +9,12 @@ dosisgateway:
       -   name: dev
           url: http://localhost:29090/
           itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 10
       -   name: fout
           url: http://localhost:29090/fout
           itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 3

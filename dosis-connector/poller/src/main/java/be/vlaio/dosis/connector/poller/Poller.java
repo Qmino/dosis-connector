@@ -21,13 +21,11 @@ import java.time.LocalDateTime;
 public class Poller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Poller.class);
-    private WorkInProgress wip;
-    private DosisItemFactory dif;
+    private final WorkInProgress wip;
+    private final DosisItemFactory dif;
 
     // Permanent items
-    private final String baseUrl;
-    private final String name;
-    private final int itemLimit;
+    private final PollerSpecification spec;
 
     private final DossierbeheersysteemFetcher itemFetcher;
     // Current status
@@ -45,15 +43,13 @@ public class Poller {
      * @param spec the spec containing the name and base url of the poller
      */
     public Poller(PollerSpecification spec, WorkInProgress wip, DosisItemFactory dif) {
-        info("Opstart");
-        this.baseUrl = spec.getUrl();
-        this.name = spec.getName();
-        this.itemLimit = spec.getItemLimit();
-        this.itemFetcher = new DossierbeheersysteemFetcher(baseUrl);
+        this.spec = spec;
+        this.itemFetcher = new DossierbeheersysteemFetcher(spec.getUrl());
         this.wip = wip;
         this.dif = dif;
-        this.lastProcessed = wip.getLastIndexProcessed(this.name);
+        this.lastProcessed = wip.getLastIndexProcessed(spec.getName());
         this.active = true;
+        info("Opgestart");
     }
 
     /**
@@ -65,12 +61,13 @@ public class Poller {
     public void fetchItems() {
         boolean runAgain = true;
         while (active && runAgain && wip.readyToAcceptNewWork()
-                && skips >= 10 * consecutiveErrors * consecutiveErrors * consecutiveErrors
+                && skips >= spec.getBackoffBase() * Math.pow(consecutiveErrors, spec.getBackoffExponent())
         ) {
             try {
                 skips = 0;
                 lastFetched = LocalDateTime.now();
-                DossierStatusCollectionTO fetched = itemFetcher.fetchItems(lastProcessed, itemLimit);
+                DossierStatusCollectionTO fetched = itemFetcher.fetchItems(
+                        lastProcessed+1, spec.getItemLimit());
                 consecutiveErrors = 0;
                 int nbElemsRetrieved = fetched.getElementen().size();
                 nbItemsRetrievedSinceStart += nbElemsRetrieved;
@@ -78,7 +75,7 @@ public class Poller {
                 info(lastResponse);
                 for (DossierStatusTO item: fetched.getElementen()) {
                     DosisItem element = dif.from(item);
-                    wip.addNewDosisItem(element, name, item.getIndex());
+                    wip.addNewDosisItem(element, spec.getName(), item.getIndex());
                     lastProcessed = item.getIndex();
                 }
                 if (nbElemsRetrieved > 0) {
@@ -90,7 +87,7 @@ public class Poller {
                 lastResponse = "Fout bij ophalen elementen van dossierbeheersysteem: " + e.getMessage();
                 info(lastResponse);
                 consecutiveErrors++;
-                if (consecutiveErrors > 3) {
+                if (consecutiveErrors > spec.getBackoffMaxRetries()) {
                     info("Permanente deactivatie wegens teveel fouten. Heractivatie manueel mogelijk.");
                     active = false;
                 }
@@ -106,13 +103,13 @@ public class Poller {
     }
 
     private void info(String s) {
-        LOGGER.info("Poller " + name + ": " + s);
+        LOGGER.info("Poller " + spec.getName() + ": " + s);
     }
 
     public PollerStatus getStatus() {
         return new PollerStatus.Builder()
                 .withActive(active)
-                .withName(name)
+                .withName(spec.getName())
                 .withCurrentItem(lastProcessed)
                 .withLastPoll(lastFetched)
                 .withNbItemsRetrieved(nbItemsRetrievedSinceStart)

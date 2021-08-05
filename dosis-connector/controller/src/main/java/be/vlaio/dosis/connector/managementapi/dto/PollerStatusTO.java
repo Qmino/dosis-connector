@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 public class PollerStatusTO {
 
-    private long currentItem;
-    private int nbItemsRetrieved;
-    private boolean active;
-    private LocalDateTime lastPoll;
-    private LocalDateTime lastElementRetrievedAt;
-    private String lastResult;
+    private final long currentItem;
+    private final int nbItemsRetrieved;
+    private final boolean active;
+    private final LocalDateTime lastPoll;
+    private final LocalDateTime lastElementRetrievedAt;
+    private final String lastResult;
 
     public PollerStatusTO(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,

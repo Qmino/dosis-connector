@@ -78,6 +78,7 @@ public class DossierbeheersysteemFetcher {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<DossierStatusCollectionTO> exchange = null;
         try {
+            LOGGER.debug("Executing REST call: " + fetchUrl + ", index: " + index + ", limiet: " + limiet);
             exchange
                     = restTemplate.exchange(fetchUrl,
                     HttpMethod.GET,
