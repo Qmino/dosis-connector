@@ -21,7 +21,7 @@ public class DbSimService {
 
     @Scheduled(fixedDelayString = "1000")
     public void update() {
-        if (list.size() < 5000) {
+        if (list.size() < 6000) {
             for (int i = 0; i < 3; i++) {
                 counter++;
                 list.add(someDossierStatusTO());
@@ -41,7 +41,7 @@ public class DbSimService {
             elementen = new ArrayList<>();
         } else {
             int from = Math.max(0, index);
-            int to = Math.min(list.size()-1, index+limiet);
+            int to = Math.min(list.size(), index+limiet);
             elementen = list.subList(from, to);
             nieuweIndex = to;
         }

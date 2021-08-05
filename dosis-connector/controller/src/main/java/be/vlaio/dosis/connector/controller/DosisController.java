@@ -1,5 +1,6 @@
 package be.vlaio.dosis.connector.controller;
 
+import be.vlaio.dosis.connector.managementapi.exceptions.ResourceNotFoundException;
 import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
 import be.vlaio.dosis.connector.common.DosisConnectorStatus;
@@ -21,7 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class DosisController implements CommandLineRunner {
+public class DosisController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DosisController.class);
 
@@ -40,8 +41,8 @@ public class DosisController implements CommandLineRunner {
 	public void init() {
 		for (PollerSpecification spec: props.getInstances()) {
 			if (!activePollers.containsKey(spec.getName())) {
-				LOGGER.info("Starting poller from config-file: " + spec.getName());
-				activePollers.put(spec.getName(), pollerFactory.apply(spec).apply(wip, dosisItemFactory));
+				LOGGER.info("Aanmaken van poller uit config-bestand: " + spec.getName());
+				addPoller(spec);
 			}
 		}
 	}
@@ -53,12 +54,29 @@ public class DosisController implements CommandLineRunner {
 				.build();
 	}
 
-	@Scheduled(fixedRate = 5000)
-	public void reportCurrentTime() {
+	public boolean setActivityStatus(String pollerName, boolean active, boolean resetBackoff) {
+		Poller poller = activePollers.get(pollerName);
+		if (poller == null) {
+			throw new ResourceNotFoundException("Geen poller met de naam " + pollerName + " is actief.");
+		} else {
+			poller.setActive(active);
+			LOGGER.info("Poller " + pollerName + ": activity status aangepast naar " + active);
+			if (resetBackoff) {
+				poller.resetBackoff();
+				LOGGER.info("Poller " + pollerName + ": exponential backoff reset");
+			}
+		}
+		return poller.isActive();
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-//		LOGGER.info("Hello from {}", this.getClass().getSimpleName());
+	public boolean addPoller(PollerSpecification specification) {
+		if (activePollers.containsKey(specification.getName())) {
+			LOGGER.warn("Poller met naam " + specification.getName() + " bestaat reeds, niet aangemaakt.");
+			return false;
+		} else {
+			activePollers.put(specification.getName(), pollerFactory.apply(specification).apply(wip, dosisItemFactory));
+			return true;
+		}
 	}
+
 }

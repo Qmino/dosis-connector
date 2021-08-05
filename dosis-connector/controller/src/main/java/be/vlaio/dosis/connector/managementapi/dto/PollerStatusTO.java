@@ -12,16 +12,24 @@ public class PollerStatusTO {
     private final LocalDateTime lastPoll;
     private final LocalDateTime lastElementRetrievedAt;
     private final String lastResult;
+    private final String name;
+    private final int numberOfConsecutiveErrors;
 
     public PollerStatusTO(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,
-                          String lastResult) {
+                          String lastResult, String name, int numberOfConsecutiveErrors) {
         this.currentItem = currentItem;
         this.nbItemsRetrieved = nbItemsRetrieved;
         this.active = active;
         this.lastPoll = lastPoll;
         this.lastElementRetrievedAt = lastElementRetrievedAt;
         this.lastResult = lastResult;
+        this.name = name;
+        this.numberOfConsecutiveErrors = numberOfConsecutiveErrors;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public long getCurrentItem() {
@@ -48,6 +56,10 @@ public class PollerStatusTO {
         return lastResult;
     }
 
+    public int getNumberOfConsecutiveErrors() {
+        return numberOfConsecutiveErrors;
+    }
+
     public static final class Builder {
         private long currentItem;
         private int nbItemsRetrieved;
@@ -55,6 +67,8 @@ public class PollerStatusTO {
         private LocalDateTime lastPoll;
         private LocalDateTime lastElementRetrievedAt;
         private String lastResult;
+        private String name;
+        private int numberOfConsecutiveErrors;
 
         public Builder withCurrentItem(int currentItem) {
             this.currentItem = currentItem;
@@ -86,6 +100,16 @@ public class PollerStatusTO {
             return this;
         }
 
+        public Builder withNumberOfConsecutiveErrors(int numberOfConsecutiveErrors) {
+            this.numberOfConsecutiveErrors = numberOfConsecutiveErrors;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
         public Builder from(PollerStatus status) {
             this.active = status.isActive();
             this.currentItem = status.getCurrentItem();
@@ -93,12 +117,14 @@ public class PollerStatusTO {
             this.lastElementRetrievedAt = status.getLastElementRetrievedAt();
             this.nbItemsRetrieved = status.getNbItemsRetrieved();
             this.lastResult = status.getLastResponse();
+            this.name = status.getName();
+            this.numberOfConsecutiveErrors = status.getNbOfConsecutiveErrors();
             return this;
         }
 
         public PollerStatusTO build() {
             return new PollerStatusTO(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt,
-                    lastResult);
+                    lastResult, name, numberOfConsecutiveErrors);
         }
     }
 }

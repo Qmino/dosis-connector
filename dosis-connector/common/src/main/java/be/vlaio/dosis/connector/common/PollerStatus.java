@@ -7,14 +7,15 @@ public class PollerStatus {
     private final long currentItem;
     private final int nbItemsRetrieved;
     private final boolean active;
-    private String name;
+    private final String name;
     private final LocalDateTime lastPoll;
     private final LocalDateTime lastElementRetrievedAt;
-    private String lastResponse;
+    private final String lastResponse;
+    private final int nbOfConsecutiveErrors;
 
     public PollerStatus(long currentItem, int nbItemsRetrieved, boolean active,
                           LocalDateTime lastPoll, LocalDateTime lastElementRetrievedAt,
-                        String name, String lastResponse) {
+                        String name, String lastResponse, int nbOfConsecutiveErrors) {
         this.currentItem = currentItem;
         this.nbItemsRetrieved = nbItemsRetrieved;
         this.active = active;
@@ -22,6 +23,11 @@ public class PollerStatus {
         this.lastElementRetrievedAt = lastElementRetrievedAt;
         this.name = name;
         this.lastResponse = lastResponse;
+        this.nbOfConsecutiveErrors = nbOfConsecutiveErrors;
+    }
+
+    public int getNbOfConsecutiveErrors() {
+        return nbOfConsecutiveErrors;
     }
 
     public long getCurrentItem() {
@@ -60,6 +66,7 @@ public class PollerStatus {
         private LocalDateTime lastPoll;
         private LocalDateTime lastElementRetrievedAt;
         private String lastResponse;
+        private int nbConsecutiveErrors;
 
         public Builder withCurrentItem(long currentItem) {
             this.currentItem = currentItem;
@@ -81,6 +88,11 @@ public class PollerStatus {
             return this;
         }
 
+        public Builder withConsecutiveErrors(int nbConsecutiveErrors) {
+            this.nbConsecutiveErrors = nbConsecutiveErrors;
+            return this;
+        }
+
         public Builder withLastPoll(LocalDateTime lastPoll) {
             this.lastPoll = lastPoll;
             return this;
@@ -98,7 +110,7 @@ public class PollerStatus {
 
         public PollerStatus build() {
             return new PollerStatus(currentItem, nbItemsRetrieved, active, lastPoll, lastElementRetrievedAt,
-                    name, lastResponse);
+                    name, lastResponse, nbConsecutiveErrors);
         }
     }
 }

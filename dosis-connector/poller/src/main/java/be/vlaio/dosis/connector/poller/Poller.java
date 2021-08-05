@@ -72,7 +72,11 @@ public class Poller {
                 int nbElemsRetrieved = fetched.getElementen().size();
                 nbItemsRetrievedSinceStart += nbElemsRetrieved;
                 lastResponse = nbElemsRetrieved + " succesvol opgehaald.";
-                info(lastResponse);
+                if (nbElemsRetrieved > 0) {
+                    info(lastResponse);
+                } else {
+                    debug(lastResponse);
+                }
                 for (DossierStatusTO item: fetched.getElementen()) {
                     DosisItem element = dif.from(item);
                     wip.addNewDosisItem(element, spec.getName(), item.getIndex());
@@ -106,6 +110,10 @@ public class Poller {
         LOGGER.info("Poller " + spec.getName() + ": " + s);
     }
 
+    private void debug(String s) {
+        LOGGER.debug("Poller " + spec.getName() + ": " + s);
+    }
+
     public PollerStatus getStatus() {
         return new PollerStatus.Builder()
                 .withActive(active)
@@ -116,5 +124,15 @@ public class Poller {
                 .withLastElementRetrievedAt(lastRetrieved)
                 .withLastResponse(lastResponse)
                 .build();
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void resetBackoff() {
+        this.lastResponse = null;
+        this.skips = 0;
+        this.consecutiveErrors = 0;
     }
 }
