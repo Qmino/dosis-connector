@@ -1,17 +1,15 @@
 package be.vlaio.dosis.connector.controller;
 
+import be.vlaio.dosis.connector.common.DosisConnectorStatus;
+import be.vlaio.dosis.connector.common.PollerSpecification;
 import be.vlaio.dosis.connector.managementapi.exceptions.ResourceNotFoundException;
 import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
-import be.vlaio.dosis.connector.common.DosisConnectorStatus;
-import be.vlaio.dosis.connector.common.PollerSpecification;
 import be.vlaio.dosis.connector.springconf.PollersConfiguration;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

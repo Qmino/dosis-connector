@@ -1,7 +1,7 @@
-package be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto;
+package be.vlaio.dosis.connector.common;
 
 /**
- * Beschrijft de verschillende categorieën aan fouten die de dossierbeheersysteemfetcher kan teruggeven.
+ * Beschrijft de verschillende categorieën aan fouten die de externe servers kunnen teruggeven.
  */
 public enum ServiceError {
 

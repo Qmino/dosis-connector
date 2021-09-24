@@ -1,7 +1,7 @@
 package be.vlaio.dosis.connector.poller.dossierbeheersysteem;
 
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusCollectionTO;
-import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.ServiceError;
+import be.vlaio.dosis.connector.common.ServiceError;
 import org.springframework.http.ResponseEntity;
 
 public class FetchException extends Exception {

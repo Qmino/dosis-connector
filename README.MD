@@ -123,9 +123,9 @@ Als de poller geconfigureerd is als volgt:
 
 Bij terugkerende fouten aan het dossierbeheersysteem zal de poller als volgt opnieuw proberen:
 
-* 1e retry na 50 seconden
-* 2e retry na 6 minuten
-* 3e retry na 22 minuten
+* 1e retry na 50 seconden (10 polls overgeslagen aan 5 sec/poll)
+* 2e retry na 6 minuten   (80 polls overgeslagen aan 5 sec/poll)
+* 3e retry na 22 minuten  (270 polls overgeslagen aan 5 sec/poll)
 * 4e retry na 53 minuten
 * 5e retry na 1u 44 minuten
 * 6e retry na 3u
@@ -138,7 +138,26 @@ Als die 10e retry dan ook gefaald is deactiveert de poller zich permanent
 
 
 ### De Controller
-### De Pusher
+
+### De Pusher & De Validator
+
+Zowel de pusher als de validator worden geconfigureerd in de configuratiefile onder de ```dosis``` sectie die er uitziet als volgt:
+```
+  dosis:
+    clientid: 1234
+    tokenUrl: https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token
+    baseUrl: https://beta.dosis.dev-vlaanderen.be
+    bronUri: urn://somebron/
+    privateWebKey: someFileName.key
+```
+
+Deze configuratieparameters bepalen het gedrag in de interactie met het DOSIS platform. 
+
+* De ```clientid``` heb je normaal ontvangen bij de aansluiting met DOSIS en is een unieke id van je oauth client.
+* De ```tokenUrl``` en ```baseUrl``` parameters bepalen welke URLS er worden gebruikt bij de communicatie naar DOSIS. In het bovenstaande voorbeeld zijn de waarden gekozen voor de beta/test omgeving. Voor productie zijn de waarden respectievelijk https://oauth.vlaanderen.be/authorization/ws/oauth/v2/token en https://prod.dosis-burgers.vlaanderen.be
+* De ```bronUri``` geeft aan onder welke bron alle dosis items die je zal publiceren zullen vallen bij DOSIS. De dosisconnector laat niet toe om meerdere bronUri's te specificeren. Indien je die nood hebt, zal je meerdere instanties van de dosisConnector moeten gebruiken.
+* ```privateWebKey``` is een verwijzing naar het bestand waar het private gedeelte van je Json Web Key kan gevonden worden. De Json webkey wordt gegenereerd als een paar waarvan het publieke gedeelte moet worden geupload in de admin site van DOSIS, en het private gedeelte ter beschikking moet staan van de dosis connector om de oproepen naar dosis te kunnen uitvoeren. Een gedetailleerde uitleg van ho je een Json Web Key kan genereren, alsook hoe je deze kan opladen kan je vinden op [deze url](https://vlaamseoverheid.atlassian.net/wiki/spaces/IKPubliek/pages/2680390681/Beveiliging+van+de+DOSIS-API#Hoe-een-JSON-Web-Token-lokaal-genereren). 
+
 ### De Validator
 ### WorkInProgress & DiskStore
 ## Onderlinge afhankelijkheden
