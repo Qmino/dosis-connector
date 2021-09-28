@@ -1,8 +1,8 @@
 package be.vlaio.dosis.connector.poller;
 
-import be.vlaio.dosis.connector.common.DosisItem;
-import be.vlaio.dosis.connector.common.PollerSpecification;
-import be.vlaio.dosis.connector.common.PollerStatus;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.PollerStatus;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.DossierbeheersysteemFetcher;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.FetchException;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusCollectionTO;
@@ -55,7 +55,8 @@ public class Poller {
     /**
      * Hoofd-loop van de poller: fetched nieuwe elementen bij het dossierbeheersysteem en voegt deze toe aan de WIP.
      * Zolang er elementen aanwezig waren in de call, blijft de poller calls doen. Vanaf het werk is afgelopen,
-     * zal de methode stoppen met de opgelegde delay.
+     * zal de methode stoppen met de opgelegde delay. Exponential backoff wordt gebruikt in geval er fouten zijn bij
+     * het ophalen van de de gegevens bij het dossiersysteem.
      */
     @Scheduled(fixedDelayString = "${dosisgateway.poller.delay}")
     public void fetchItems() {

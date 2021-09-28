@@ -2,12 +2,12 @@ package be.vlaio.dosis.connector.pusher.dosis.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ProductIdTo {
+public class ProductIdTO {
 
     @JsonProperty("Id")
     private String id;
 
-    public ProductIdTo(String id) {
+    public ProductIdTO(String id) {
         this.id = id;
     }
 

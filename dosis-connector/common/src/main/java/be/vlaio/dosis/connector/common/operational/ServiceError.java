@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.common.operational;
 
 /**
  * Beschrijft de verschillende categorieën aan fouten die de externe servers kunnen teruggeven.
@@ -25,5 +25,9 @@ public enum ServiceError {
     /**
      * het type fout is ongekend.
      */
-    UNKNOWN
+    UNKNOWN,
+    /**
+     * Er is een probleem bij de authenticatie met de server
+     */
+    AUTHENTICATION_ERROR
 }

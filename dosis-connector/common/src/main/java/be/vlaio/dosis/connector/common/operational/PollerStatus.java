@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.common.operational;
 
 import java.time.LocalDateTime;
 

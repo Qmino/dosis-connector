@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.managementapi.dto;
 
-import be.vlaio.dosis.connector.common.DosisConnectorStatus;
+import be.vlaio.dosis.connector.common.operational.DosisConnectorStatus;
 
 import java.util.ArrayList;
 import java.util.List;

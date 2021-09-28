@@ -1,7 +1,7 @@
 package be.vlaio.dosis.connector.managementapi.dto;
 
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
-import be.vlaio.dosis.connector.common.WipStatus;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.operational.WipStatus;
 
 import java.util.HashMap;
 import java.util.Map;

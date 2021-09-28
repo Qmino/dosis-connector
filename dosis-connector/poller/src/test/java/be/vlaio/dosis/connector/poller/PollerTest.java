@@ -1,8 +1,8 @@
 package be.vlaio.dosis.connector.poller;
 
-import be.vlaio.dosis.connector.common.PollerSpecification;
-import be.vlaio.dosis.connector.common.PollerStatus;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.PollerStatus;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.WireMockInitializer;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierbeheersysteemTOMother;
 import be.vlaio.dosis.connector.wip.DiskStore;

@@ -1,7 +1,7 @@
 package be.vlaio.dosis.connector.wip;
 
-import be.vlaio.dosis.connector.common.DosisItem;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

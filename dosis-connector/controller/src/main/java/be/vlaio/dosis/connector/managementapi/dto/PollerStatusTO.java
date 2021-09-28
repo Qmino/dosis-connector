@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.managementapi.dto;
 
-import be.vlaio.dosis.connector.common.PollerStatus;
+import be.vlaio.dosis.connector.common.operational.PollerStatus;
 
 import java.time.LocalDateTime;
 

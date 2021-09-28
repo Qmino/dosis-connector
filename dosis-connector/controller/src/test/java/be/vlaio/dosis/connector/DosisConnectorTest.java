@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import be.vlaio.dosis.connector.controller.DosisController;
 import be.vlaio.dosis.connector.wip.PollerCommandLineRunner;
-import be.vlaio.dosis.connector.wip.PusherCommandLineRunner;
 import be.vlaio.dosis.connector.wip.WipCommandLineRunner;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +23,14 @@ public class DosisConnectorTest {
 	@Autowired
 	private PollerCommandLineRunner pollerCommandLineRunner;
 
-	@Autowired
-	private PusherCommandLineRunner pusherCommandLineRunner;
+//	@Autowired
+//	private PusherCommandLineRunner pusherCommandLineRunner;
 
 	@Test
 	void contextLoads() {
 		assertThat(controllerCommandLineRunner).isNotNull();
 		assertThat(wipCommandLineRunner).isNotNull();
 		assertThat(pollerCommandLineRunner).isNotNull();
-		assertThat(pusherCommandLineRunner).isNotNull();
+	//	assertThat(pusherCommandLineRunner).isNotNull();
 	}
 }

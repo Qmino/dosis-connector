@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.common.operational;
 
 /**
  * De verwerkingsstatus van dit item in de dosisconnector. Deze status is ongerelateerd aan de dosis status.

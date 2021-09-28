@@ -1,6 +1,5 @@
 package be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto;
 
-import be.vlaio.dosis.connector.common.ToegangsRecht;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 

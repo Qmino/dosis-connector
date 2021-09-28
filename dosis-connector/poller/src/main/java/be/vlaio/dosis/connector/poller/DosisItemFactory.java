@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.poller;
 
-import be.vlaio.dosis.connector.common.*;
+import be.vlaio.dosis.connector.common.dosisdomain.*;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

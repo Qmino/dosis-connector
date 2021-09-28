@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.pusher.dosis.dto;
 
-import be.vlaio.dosis.connector.common.Adres;
+import be.vlaio.dosis.connector.common.dosisdomain.Adres;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

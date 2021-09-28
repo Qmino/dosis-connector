@@ -1,16 +1,16 @@
 package be.vlaio.dosis.connector.pusher.dosis.dto;
 
-import be.vlaio.dosis.connector.common.Agent;
-import be.vlaio.dosis.connector.common.BurgerAgent;
-import be.vlaio.dosis.connector.common.OndernemerAgent;
-import be.vlaio.dosis.connector.common.ToegangsRecht;
+import be.vlaio.dosis.connector.common.dosisdomain.Agent;
+import be.vlaio.dosis.connector.common.dosisdomain.BurgerAgent;
+import be.vlaio.dosis.connector.common.dosisdomain.OndernemerAgent;
+import be.vlaio.dosis.connector.common.dosisdomain.ToegangsRecht;
 import be.vlaio.dosis.connector.pusher.dosis.DosisConstanten;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DosisAgentTo {
+public class DosisAgentTO {
 
     @JsonProperty("Identificatie")
     private String identificatie;
@@ -18,12 +18,12 @@ public class DosisAgentTo {
     @JsonProperty("Toegangsrechten")
     private List<DosisToegangsRechtTO> toegangsrechten;
 
-    public DosisAgentTo(String identificatie, List<DosisToegangsRechtTO> toegangsrechten) {
+    public DosisAgentTO(String identificatie, List<DosisToegangsRechtTO> toegangsrechten) {
         this.identificatie = identificatie;
         this.toegangsrechten = toegangsrechten;
     }
 
-    public DosisAgentTo(Agent agent) {
+    public DosisAgentTO(Agent agent) {
         this.toegangsrechten = new ArrayList<>();
         if (agent instanceof OndernemerAgent) {
             OndernemerAgent a = (OndernemerAgent) agent;

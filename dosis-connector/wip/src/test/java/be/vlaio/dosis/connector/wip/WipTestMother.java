@@ -1,7 +1,7 @@
 package be.vlaio.dosis.connector.wip;
 
 import be.vlaio.dosis.connector.common.CommonTestMother;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 
 import java.util.ArrayList;
 

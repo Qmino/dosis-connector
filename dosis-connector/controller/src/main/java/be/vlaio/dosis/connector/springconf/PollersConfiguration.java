@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.springconf;
 
-import be.vlaio.dosis.connector.common.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 

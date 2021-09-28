@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.common.dosisdomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

@@ -1,8 +1,8 @@
 package be.vlaio.dosis.connector.wip;
 
-import be.vlaio.dosis.connector.common.DosisItem;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
-import be.vlaio.dosis.connector.common.WipStatus;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.operational.WipStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

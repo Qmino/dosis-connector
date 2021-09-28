@@ -1,12 +1,12 @@
 package be.vlaio.dosis.connector.pusher.dosis.dto;
 
-import be.vlaio.dosis.connector.common.DossierStatus;
+import be.vlaio.dosis.connector.common.dosisdomain.DossierStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = DosisDossierStatusTo.Builder.class)
-public class DosisDossierStatusTo {
+@JsonDeserialize(builder = DosisDossierStatusTO.Builder.class)
+public class DosisDossierStatusTO {
 
     @JsonProperty("VlaamsCode")
     private String vlaamseCode;
@@ -17,7 +17,7 @@ public class DosisDossierStatusTo {
     @JsonProperty("Actie")
     private DosisDossierStatusActieTO actie;
 
-    public DosisDossierStatusTo(String vlaamseCode, String vlaamseFase, String detail, DosisDossierStatusActieTO actie) {
+    public DosisDossierStatusTO(String vlaamseCode, String vlaamseFase, String detail, DosisDossierStatusActieTO actie) {
         this.vlaamseCode = vlaamseCode;
         this.vlaamseFase = vlaamseFase;
         this.detail = detail;
@@ -66,8 +66,8 @@ public class DosisDossierStatusTo {
             return new Builder().withVlaamseCode(vlaamseCode).withVlaamseFase(vlaamseFase).withDetail(detail).withActie(actie);
         }
 
-        public DosisDossierStatusTo build() {
-            return new DosisDossierStatusTo(vlaamseCode, vlaamseFase, detail, actie);
+        public DosisDossierStatusTO build() {
+            return new DosisDossierStatusTO(vlaamseCode, vlaamseFase, detail, actie);
         }
     }
 }

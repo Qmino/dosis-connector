@@ -1,13 +1,12 @@
 package be.vlaio.dosis.connector.wip;
 
-import be.vlaio.dosis.connector.common.DosisItem;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
 import be.vlaio.dosis.connector.common.CommonTestMother;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @SuppressWarnings("ConstantConditions")

@@ -1,5 +1,7 @@
 package be.vlaio.dosis.connector.common;
 
+import be.vlaio.dosis.connector.common.dosisdomain.*;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -7,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -91,7 +92,7 @@ public class CommonTestMother {
    }
 
    public static String randomStraat() {
-        return random(steden);
+        return random(straten);
    }
 
    public static DossierStatus.Builder someDossierStatus() {
@@ -132,7 +133,7 @@ public class CommonTestMother {
     }
 
     public static <T> List<T> randomList(Supplier<T> generator) {
-        return random(r.nextInt(5), generator);
+        return random(r.nextInt(5)+1, generator);
     }
 
     public static <T> List<T> random(int size, Supplier<T> generator) {

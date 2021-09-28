@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DosisIdentificatieTO {
 
-    @JsonProperty("Bron")
+
     private final String bron;
-    @JsonProperty("DossierNummer")
+
     private final String dossierNummer;
 
     public String getBron() {
@@ -17,7 +17,7 @@ public class DosisIdentificatieTO {
         return dossierNummer;
     }
 
-    public DosisIdentificatieTO(String bron, String dossierNummer) {
+    public DosisIdentificatieTO(@JsonProperty("Bron") String bron, @JsonProperty("DossierNummer") String dossierNummer) {
         this.bron = bron;
         this.dossierNummer = dossierNummer;
     }

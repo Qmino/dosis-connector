@@ -3,6 +3,8 @@ package be.vlaio.dbssim;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusCollectionTO;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusTO;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierbeheersysteemTOMother;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/")
 public class DbSimService {
+
+    @Value("${hardcoded.product}")
+    private int product = -1;
 
     private int counter;
     private Random random = new Random();
@@ -29,7 +34,7 @@ public class DbSimService {
         }
     }
 
-    @GetMapping(value="dossierstatusveranderingen", produces="application/json")
+    @GetMapping(value = "dossierstatusveranderingen", produces = "application/json")
     @ResponseBody
     public DossierStatusCollectionTO getStatus(
             @RequestParam("index") int index,
@@ -41,7 +46,7 @@ public class DbSimService {
             elementen = new ArrayList<>();
         } else {
             int from = Math.max(0, index);
-            int to = Math.min(list.size(), index+limiet);
+            int to = Math.min(list.size(), index + limiet);
             elementen = list.subList(from, to);
             nieuweIndex = to;
         }
@@ -55,7 +60,7 @@ public class DbSimService {
                 .withId(UUID.randomUUID().toString()).build();
     }
 
-    @GetMapping(value="fout/dossierstatusveranderingen", produces="application/json")
+    @GetMapping(value = "fout/dossierstatusveranderingen", produces = "application/json")
     @ResponseBody
     public DossierStatusCollectionTO getErrorStatus(
             @RequestParam("index") int index,
@@ -65,9 +70,12 @@ public class DbSimService {
 
 
     private DossierStatusTO someDossierStatusTO() {
-        return DossierbeheersysteemTOMother.someDossierStatus()
-                .withIndex(counter)
-                .build();
+        DossierStatusTO.Builder value = DossierbeheersysteemTOMother.someDossierStatus()
+                .withIndex(counter);
+        if (product != -1) {
+            value.withProduct(product);
+        }
+        return value.build();
     }
 
 }

@@ -1,12 +1,11 @@
 package be.vlaio.dosis.connector.poller;
 
-import be.vlaio.dosis.connector.common.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package be.vlaio.dosis.connector.common;
+package be.vlaio.dosis.connector.common.operational;
 
 public class PollerSpecification {
     private String name;

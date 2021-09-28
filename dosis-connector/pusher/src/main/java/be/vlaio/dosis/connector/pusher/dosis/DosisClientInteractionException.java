@@ -1,6 +1,6 @@
 package be.vlaio.dosis.connector.pusher.dosis;
 
-import be.vlaio.dosis.connector.common.ServiceError;
+import be.vlaio.dosis.connector.common.operational.ServiceError;
 import org.springframework.http.ResponseEntity;
 
 @SuppressWarnings("rawtypes")

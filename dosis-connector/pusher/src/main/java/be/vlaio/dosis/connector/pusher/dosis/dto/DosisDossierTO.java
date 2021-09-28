@@ -1,7 +1,6 @@
 package be.vlaio.dosis.connector.pusher.dosis.dto;
 
-import be.vlaio.dosis.connector.common.Agent;
-import be.vlaio.dosis.connector.common.DosisItem;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ public class DosisDossierTO {
     @JsonProperty("WijzigingsDatum")
     private LocalDateTime wijzigingsDatum;
     @JsonProperty("Status")
-    private DosisDossierStatusTo status;
+    private DosisDossierStatusTO status;
     @JsonProperty("TypeDossierCode")
     private String typeDossierCode = "DossierStatus"; // Voor onze doelstellingen hardcoded
 
@@ -32,22 +31,22 @@ public class DosisDossierTO {
     // uitbreidingen die niet nodig blijken te zijn. Toekomstige versies van dosis gaan hier een enkel veld van maken.
     // Vandaar dat we in de builder hier een enkel veld van maken.
     @JsonProperty("Producten")
-    private List<ProductIdTo> producten;
+    private List<ProductIdTO> producten;
 
     @JsonProperty("DossierBeheerder")
     private DosisDossierContactTO dossierBeheerder;
 
     @JsonProperty("Agenten")
-    private List<DosisAgentTo> agenten;
+    private List<DosisAgentTO> agenten;
 
     public DosisDossierTO(DosisIdentificatieTO identificatie,
                           UUID uploadId,
                           String naam,
                           LocalDateTime wijzigingsDatum,
-                          DosisDossierStatusTo status,
-                          List<ProductIdTo> producten,
+                          DosisDossierStatusTO status,
+                          List<ProductIdTO> producten,
                           DosisDossierContactTO dossierBeheerder,
-                          List<DosisAgentTo> agenten) {
+                          List<DosisAgentTO> agenten) {
         this.identificatie = identificatie;
         this.uploadId = uploadId;
         this.naam = naam;
@@ -74,7 +73,7 @@ public class DosisDossierTO {
         return wijzigingsDatum;
     }
 
-    public DosisDossierStatusTo getStatus() {
+    public DosisDossierStatusTO getStatus() {
         return status;
     }
 
@@ -82,7 +81,7 @@ public class DosisDossierTO {
         return typeDossierCode;
     }
 
-    public List<ProductIdTo> getProducten() {
+    public List<ProductIdTO> getProducten() {
         return producten;
     }
 
@@ -90,7 +89,7 @@ public class DosisDossierTO {
         return dossierBeheerder;
     }
 
-    public List<DosisAgentTo> getAgenten() {
+    public List<DosisAgentTO> getAgenten() {
         return agenten;
     }
 
@@ -99,10 +98,10 @@ public class DosisDossierTO {
         private UUID uploadId;
         private String naam;
         private LocalDateTime wijzigingsDatum;
-        private DosisDossierStatusTo status;
-        private List<ProductIdTo> producten;
+        private DosisDossierStatusTO status;
+        private List<ProductIdTO> producten;
         private DosisDossierContactTO dossierBeheerder;
-        private List<DosisAgentTo> agenten;
+        private List<DosisAgentTO> agenten;
 
         public Builder() {
         }
@@ -127,12 +126,12 @@ public class DosisDossierTO {
             return this;
         }
 
-        public Builder withStatus(DosisDossierStatusTo status) {
+        public Builder withStatus(DosisDossierStatusTO status) {
             this.status = status;
             return this;
         }
 
-        public Builder withProduct(ProductIdTo product) {
+        public Builder withProduct(ProductIdTO product) {
             if (product != null) {
                 this.producten = new ArrayList<>();
                 this.producten.add(product);
@@ -145,7 +144,7 @@ public class DosisDossierTO {
             return this;
         }
 
-        public Builder withAgenten(List<DosisAgentTo> agenten) {
+        public Builder withAgenten(List<DosisAgentTO> agenten) {
             this.agenten = agenten;
             return this;
         }
@@ -153,14 +152,14 @@ public class DosisDossierTO {
         public Builder from(DosisItem item, String bron) {
             this.naam = item.getDossierNaam();
             this.identificatie = new DosisIdentificatieTO(bron, item.getDossierNummer());
-            this.uploadId = UUID.randomUUID();
+            this.uploadId = item.getId();   // Dit is reeds een uniek nummer voor een dosisitem.
             this.wijzigingsDatum = item.getWijzigingsDatum();
-            this.status = item.getStatus() == null ? null : new DosisDossierStatusTo.Builder().from(item.getStatus()).build();
-            withProduct(new ProductIdTo("" + item.getProduct()));
+            this.status = item.getStatus() == null ? null : new DosisDossierStatusTO.Builder().from(item.getStatus()).build();
+            withProduct(new ProductIdTO("" + item.getProduct()));
             this.dossierBeheerder = item.getDossierBeheerder() == null ? null :  new DosisDossierContactTO.Builder().from(item.getDossierBeheerder()).build();
             this.agenten = item.getAgenten() == null
                     ? null
-                    : item.getAgenten().stream().map(DosisAgentTo::new).collect(Collectors.toList());
+                    : item.getAgenten().stream().map(DosisAgentTO::new).collect(Collectors.toList());
             return this;
         }
 

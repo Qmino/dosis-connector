@@ -1,10 +1,12 @@
 package be.vlaio.dosis.connector.controller;
 
-import be.vlaio.dosis.connector.common.DosisConnectorStatus;
-import be.vlaio.dosis.connector.common.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.DosisConnectorStatus;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
 import be.vlaio.dosis.connector.managementapi.exceptions.ResourceNotFoundException;
 import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
+import be.vlaio.dosis.connector.pusher.Pusher;
+import be.vlaio.dosis.connector.pusher.Validator;
 import be.vlaio.dosis.connector.springconf.PollersConfiguration;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ public class DosisController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DosisController.class);
 
 	@Autowired
-	private PollersConfiguration props;
+	private PollersConfiguration pollersConfiguration;
 	@Autowired
 	private Function<PollerSpecification, BiFunction<WorkInProgress, DosisItemFactory, Poller>> pollerFactory;
 	@Autowired
@@ -34,10 +36,15 @@ public class DosisController {
 	private DosisItemFactory dosisItemFactory;
 
 	private Map<String, Poller> activePollers = new HashMap<>();
+	@Autowired
+	private Pusher pusher;
+	@Autowired
+	private Validator validator;
 
 	@PostConstruct
 	public void init() {
-		for (PollerSpecification spec: props.getInstances()) {
+		// Initialize the pollers
+		for (PollerSpecification spec: pollersConfiguration.getInstances()) {
 			if (!activePollers.containsKey(spec.getName())) {
 				LOGGER.info("Aanmaken van poller uit config-bestand: " + spec.getName());
 				addPoller(spec);

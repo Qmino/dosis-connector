@@ -1,8 +1,8 @@
 package be.vlaio.dosis.connector.wip;
 
 import be.vlaio.dosis.connector.common.CommonTestMother;
-import be.vlaio.dosis.connector.common.DosisItem;
-import be.vlaio.dosis.connector.common.Verwerkingsstatus;
+import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 public class WorkInProgressTest {

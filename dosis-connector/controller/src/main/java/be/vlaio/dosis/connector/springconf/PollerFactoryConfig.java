@@ -2,7 +2,7 @@ package be.vlaio.dosis.connector.springconf;
 
 import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
-import be.vlaio.dosis.connector.common.PollerSpecification;
+import be.vlaio.dosis.connector.common.operational.PollerSpecification;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

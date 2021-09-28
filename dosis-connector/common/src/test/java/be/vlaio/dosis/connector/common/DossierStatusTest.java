@@ -1,5 +1,6 @@
 package be.vlaio.dosis.connector.common;
 
+import be.vlaio.dosis.connector.common.dosisdomain.DossierStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

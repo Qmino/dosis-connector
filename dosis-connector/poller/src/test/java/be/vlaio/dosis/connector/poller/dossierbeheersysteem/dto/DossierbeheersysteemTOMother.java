@@ -94,7 +94,7 @@ public class DossierbeheersysteemTOMother {
                 .withAdres(someAdres().build())
                 .withEmail(CommonTestMother.randomEmail())
                 .withTelefoon("+3249" + RandomStringUtils.randomNumeric(7))
-                .withWebsite("www." + CommonTestMother.randomDomein())
+                .withWebsite("http://www." + CommonTestMother.randomDomein())
                 .withDienst("Dienst " + RandomStringUtils.randomNumeric(1));
     }
 
@@ -115,8 +115,9 @@ public class DossierbeheersysteemTOMother {
     }
 
     private static BurgerAgentTO.Builder someBurgerAgent() {
+
         return new BurgerAgentTO.Builder()
-                .withRijksregisternummer(RandomStringUtils.randomNumeric(11));
+                .withRijksregisternummer(randomRR());
     }
 
     private static OndernemerAgentTO.Builder someOndernemerAgent() {
@@ -132,4 +133,25 @@ public class DossierbeheersysteemTOMother {
     }
 
 
+    private static String randomRR() {
+        int year = 1940 + random.nextInt(80);
+        int month = 1 + random.nextInt(12);
+        int day = 1 + random.nextInt(28);
+        String rr = year + (month < 10 ? "0" + month : "" + month) + (day < 10 ? "0" + day : "" + day);
+        long seq = random.nextInt(1000);
+        if (seq < 10) {
+            rr += "0";
+        }
+        if (seq < 100) {
+            rr += "0";
+        }
+        rr += seq;
+        long total = Long.parseLong(rr);
+        long modulo = total % 97;
+        if (modulo < 10) {
+            rr += "0";
+        }
+        rr += modulo;
+        return rr;
+    }
 }

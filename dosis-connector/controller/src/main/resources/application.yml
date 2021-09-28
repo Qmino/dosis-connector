@@ -19,8 +19,25 @@ dosisgateway:
           backoffExponent: 3
           backoffMaxRetries: 3
   dosis:
-    clientid: 1234
+    clientId: 6776
     tokenUrl: https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token
     baseUrl: https://beta.dosis.dev-vlaanderen.be
     bronUri: urn://ovam/evoa
     privateWebKey: jsonwebkeyprivate.key
+    delay: 150
+    backoffBase: 10
+    backoffExponent: 3
+    backoffMaxRetries: 10
+
+logging:
+  level:
+    org:
+      apache:
+        http: DEBUG
+    httpclient:
+      wire: DEBUG
+spring:
+  task:
+    scheduling:
+      pool:
+        size: 5 # Set this to at least  2 + nb of pollers.

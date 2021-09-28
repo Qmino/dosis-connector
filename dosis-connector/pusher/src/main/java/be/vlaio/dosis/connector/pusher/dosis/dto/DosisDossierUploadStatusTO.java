@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DosisDossierUploadStatusTO {
 
-    @JsonProperty("Status")
+
     private String status;
-    @JsonProperty("UploadId")
     private String uploadId;
 
-    public DosisDossierUploadStatusTO(String status, String uploadId) {
+    public DosisDossierUploadStatusTO(@JsonProperty("Status") String status, @JsonProperty("UploadId") String uploadId) {
         this.status = status;
         this.uploadId = uploadId;
     }

@@ -2,7 +2,7 @@ package be.vlaio.dosis.connector.poller.dossierbeheersysteem;
 
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierStatusCollectionTO;
 import be.vlaio.dosis.connector.poller.dossierbeheersysteem.dto.DossierbeheersysteemTOMother;
-import be.vlaio.dosis.connector.common.ServiceError;
+import be.vlaio.dosis.connector.common.operational.ServiceError;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.*;
