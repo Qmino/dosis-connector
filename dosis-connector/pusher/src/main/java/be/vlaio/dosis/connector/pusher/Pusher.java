@@ -2,6 +2,7 @@ package be.vlaio.dosis.connector.pusher;
 
 
 import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.PusherValidatorStatus;
 import be.vlaio.dosis.connector.common.operational.ServiceError;
 import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import be.vlaio.dosis.connector.pusher.dosis.DosisClient;
@@ -41,7 +42,8 @@ public class Pusher {
 
     // Current status
     private boolean active;
-    private LocalDateTime lastDosisInteraction;
+    private LocalDateTime lastCallAttempt;
+    private LocalDateTime lastCallExecuted;
     private String lastResponse;
 
     /**
@@ -73,8 +75,9 @@ public class Pusher {
             try {
                 DosisItem item = itemInState.get();
                 skips = 0;
-                lastDosisInteraction = LocalDateTime.now();
+                lastCallAttempt = LocalDateTime.now();
                 DosisDossierUploadStatusTO result = client.laadDossierStatusOp(dosisTOFactory.from(item));
+                lastCallExecuted = LocalDateTime.now();
                 consecutiveErrors = 0;
                 lastResponse = "Dossier met nummer " + item.getDossierNummer() + " opgeladen met uploadId "
                         + result.getUploadId() + ". Dosis response status was: " + result.getStatus();
@@ -124,5 +127,15 @@ public class Pusher {
         this.lastResponse = null;
         this.skips = 0;
         this.consecutiveErrors = 0;
+    }
+
+    public PusherValidatorStatus getStatus() {
+        return new PusherValidatorStatus.Builder()
+                .withActive(active)
+                .withLastCallAttempt(lastCallAttempt)
+                .withLastCallExecuted(lastCallExecuted)
+                .withLastResult(lastResponse)
+                .withNumberOfConsecutiveErrors(consecutiveErrors)
+                .build();
     }
 }

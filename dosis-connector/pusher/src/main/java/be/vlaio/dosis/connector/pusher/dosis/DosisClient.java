@@ -1,5 +1,6 @@
 package be.vlaio.dosis.connector.pusher.dosis;
 
+import be.vlaio.dosis.connector.common.operational.DosisClientStatus;
 import be.vlaio.dosis.connector.common.operational.ServiceError;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisDossierTO;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisDossierUploadStatusTO;
@@ -68,6 +69,7 @@ public class DosisClient {
     private String baseServiceUrl;
     private String accessToken;
     private LocalDateTime accessTokenExpiration;
+    private boolean showSecurity;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -83,14 +85,21 @@ public class DosisClient {
      * @param baseServiceUrl de base url voor alle rest calls naar dosis
      * @param tokenUrl       de url waar de accesstoken zal worden opgevraagd
      * @param privateKeyFile de private key van de json web token die gegenereerd is.
+     * @param showSecurity indien true, zal security informatie zoals accesstoken meegegeven worden bij statusinfo,
+     *                    indien false niet.
      */
     public DosisClient(@Value("${dosisgateway.dosis.clientId}") String clientId,
                        @Value("${dosisgateway.dosis.baseUrl}") String baseServiceUrl,
                        @Value("${dosisgateway.dosis.tokenUrl}") String tokenUrl,
-                       @Value("${dosisgateway.dosis.privateWebKey}") String privateKeyFile) throws DosisClientException {
+                       @Value("${dosisgateway.dosis.privateWebKey}") String privateKeyFile,
+                       @Value("${dosisgateway.dosis.showSecurityInManagementApi: false}") Boolean showSecurity)
+            throws DosisClientException {
         this.clientId = clientId;
         setUrls(baseServiceUrl, tokenUrl);
         key = readPrivateKey(privateKeyFile);
+        if (showSecurity != null && showSecurity) {
+            this.showSecurity = showSecurity;
+        }
     }
 
     /**
@@ -111,11 +120,6 @@ public class DosisClient {
         try {
             LOGGER.debug("Sending item [DossierNummer: " + dossierStatusTO.getIdentificatie().getDossierNummer()
                     + ", UploadId: " + dossierStatusTO.getUploadId() + "] to DOSIS: " + url);
-   //         try {
-   //             System.out.println(objectMapper.writeValueAsString(dossierStatusTO));
-   //         } catch (JsonProcessingException e) {
-   //             e.printStackTrace();
-    //        }
             exchange
                     = restTemplate.exchange(
                     url,
@@ -354,5 +358,19 @@ public class DosisClient {
         } catch (ParseException | JOSEException e) {
             throw new DosisClientException("Ongeldige structuur van de private key in " + fileName, e);
         }
+    }
+
+    public DosisClientStatus getStatus() {
+        return new DosisClientStatus.Builder()
+                .withClientId(clientId)
+                .withAuthenticated(accessToken != null && accessTokenExpiration != null
+                        && accessTokenExpiration.isAfter(LocalDateTime.now()))
+                .withAuthorizationUrl(authorizationUrl)
+                .withBaseServiceUrl(baseServiceUrl)
+                .withAccessTokenExpiration(accessTokenExpiration)
+                .withAccessToken(showSecurity
+                        ? accessToken
+                        : "Niet getoond: Zet spring property dosisgateway.dosis.showSecurityInManagementApi op true")
+                .build();
     }
 }

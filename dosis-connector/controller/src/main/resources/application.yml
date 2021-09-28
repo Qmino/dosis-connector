@@ -28,14 +28,15 @@ dosisgateway:
     backoffBase: 10
     backoffExponent: 3
     backoffMaxRetries: 10
+    showSecurityInManagementApi: false
 
 logging:
   level:
     org:
       apache:
-        http: DEBUG
+        http: ERROR
     httpclient:
-      wire: DEBUG
+      wire: ERROR
 spring:
   task:
     scheduling:

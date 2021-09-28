@@ -11,7 +11,8 @@ public class DosisClientTest {
         DosisClient client = new DosisClient("6775",
                 "https://beta.dosis.dev-vlaanderen.be",
                 "https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token",
-                "../jsonwebkeyprivate.key");
+                "../jsonwebkeyprivate.key",
+                true);
         client.refreshAccessToken();
         System.out.println(client);
     }

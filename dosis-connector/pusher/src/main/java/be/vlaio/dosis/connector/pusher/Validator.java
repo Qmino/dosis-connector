@@ -2,12 +2,12 @@ package be.vlaio.dosis.connector.pusher;
 
 
 import be.vlaio.dosis.connector.common.dosisdomain.DosisItem;
+import be.vlaio.dosis.connector.common.operational.PusherValidatorStatus;
 import be.vlaio.dosis.connector.common.operational.ServiceError;
 import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import be.vlaio.dosis.connector.pusher.dosis.DosisClient;
 import be.vlaio.dosis.connector.pusher.dosis.DosisClientException;
 import be.vlaio.dosis.connector.pusher.dosis.DosisTOFactory;
-import be.vlaio.dosis.connector.pusher.dosis.dto.DosisDossierUploadStatusTO;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisDossierUploadValidatieTO;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisVerwerkingFoutTO;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
@@ -45,7 +45,8 @@ public class Validator {
 
     // Current status
     private boolean active;
-    private LocalDateTime lastDosisInteraction;
+    private LocalDateTime lastCallAttempt;
+    private LocalDateTime lastCallExecuted;
     private String lastResponse;
 
     /**
@@ -76,8 +77,9 @@ public class Validator {
             try {
                 DosisItem item = itemInState.get();
                 skips = 0;
-                lastDosisInteraction = LocalDateTime.now();
+                lastCallAttempt = LocalDateTime.now();
                 DosisDossierUploadValidatieTO result = client.getValidatieDossierStatusOp(item.getId());
+                lastCallExecuted = LocalDateTime.now();
                 consecutiveErrors = 0;
                 lastResponse = "Validatie van dossier " + item.getDossierNummer() + " (uploadId "
                         + result.getUploadId() + "). Dosis response status was: [Success: " + result.isSuccess()
@@ -142,5 +144,15 @@ public class Validator {
         this.lastResponse = null;
         this.skips = 0;
         this.consecutiveErrors = 0;
+    }
+
+    public PusherValidatorStatus getStatus() {
+        return new PusherValidatorStatus.Builder()
+                .withNumberOfConsecutiveErrors(consecutiveErrors)
+                .withLastResult(lastResponse)
+                .withLastCallAttempt(lastCallAttempt)
+                .withLastCallExecuted(lastCallExecuted)
+                .withActive(isActive())
+                .build();
     }
 }

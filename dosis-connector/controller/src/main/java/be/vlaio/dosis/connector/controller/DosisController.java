@@ -7,6 +7,7 @@ import be.vlaio.dosis.connector.poller.DosisItemFactory;
 import be.vlaio.dosis.connector.poller.Poller;
 import be.vlaio.dosis.connector.pusher.Pusher;
 import be.vlaio.dosis.connector.pusher.Validator;
+import be.vlaio.dosis.connector.pusher.dosis.DosisClient;
 import be.vlaio.dosis.connector.springconf.PollersConfiguration;
 import be.vlaio.dosis.connector.wip.WorkInProgress;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class DosisController {
 	private WorkInProgress wip;
 	@Autowired
 	private DosisItemFactory dosisItemFactory;
+	@Autowired
+	private DosisClient dosisClient;
 
 	private Map<String, Poller> activePollers = new HashMap<>();
 	@Autowired
@@ -56,6 +59,9 @@ public class DosisController {
 		return new DosisConnectorStatus.Builder()
 				.withPollers(activePollers.values().stream().map(Poller::getStatus).collect(Collectors.toList()))
 				.withWorkInProgress(wip.getStatus())
+				.withPusher(pusher.getStatus())
+				.withValidator(validator.getStatus())
+				.withDosisClient(dosisClient.getStatus())
 				.build();
 	}
 
