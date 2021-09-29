@@ -24,6 +24,8 @@ public class DosisDossierTO {
     private LocalDateTime wijzigingsDatum;
     @JsonProperty("Status")
     private DosisDossierStatusTO status;
+    @JsonProperty("Doorverwijzing")
+    private String doorverwijzing;
     @JsonProperty("TypeDossierCode")
     private String typeDossierCode = "DossierStatus"; // Voor onze doelstellingen hardcoded
 
@@ -42,6 +44,7 @@ public class DosisDossierTO {
     public DosisDossierTO(DosisIdentificatieTO identificatie,
                           UUID uploadId,
                           String naam,
+                          String doorverwijzing,
                           LocalDateTime wijzigingsDatum,
                           DosisDossierStatusTO status,
                           List<ProductIdTO> producten,
@@ -50,6 +53,7 @@ public class DosisDossierTO {
         this.identificatie = identificatie;
         this.uploadId = uploadId;
         this.naam = naam;
+        this.doorverwijzing = doorverwijzing;
         this.wijzigingsDatum = wijzigingsDatum;
         this.status = status;
         this.producten = producten;
@@ -59,6 +63,10 @@ public class DosisDossierTO {
 
     public DosisIdentificatieTO getIdentificatie() {
         return identificatie;
+    }
+
+    public String getDoorverwijzing() {
+        return doorverwijzing;
     }
 
     public UUID getUploadId() {
@@ -97,6 +105,7 @@ public class DosisDossierTO {
         private DosisIdentificatieTO identificatie;
         private UUID uploadId;
         private String naam;
+        private String doorverwijzing;
         private LocalDateTime wijzigingsDatum;
         private DosisDossierStatusTO status;
         private List<ProductIdTO> producten;
@@ -118,6 +127,11 @@ public class DosisDossierTO {
 
         public Builder withNaam(String naam) {
             this.naam = naam;
+            return this;
+        }
+
+        public Builder withDoorverwijzing(String doorverwijzing) {
+            this.doorverwijzing = doorverwijzing;
             return this;
         }
 
@@ -154,6 +168,7 @@ public class DosisDossierTO {
             this.identificatie = new DosisIdentificatieTO(bron, item.getDossierNummer());
             this.uploadId = item.getId();   // Dit is reeds een uniek nummer voor een dosisitem.
             this.wijzigingsDatum = item.getWijzigingsDatum();
+            this.doorverwijzing = item.getDoorverwijzingsUrl();
             this.status = item.getStatus() == null ? null : new DosisDossierStatusTO.Builder().from(item.getStatus()).build();
             withProduct(new ProductIdTO("" + item.getProduct()));
             this.dossierBeheerder = item.getDossierBeheerder() == null ? null :  new DosisDossierContactTO.Builder().from(item.getDossierBeheerder()).build();
@@ -169,13 +184,14 @@ public class DosisDossierTO {
                     .withUploadId(uploadId)
                     .withNaam(naam)
                     .withWijzigingsDatum(wijzigingsDatum)
+                    .withDoorverwijzing(doorverwijzing)
                     .withStatus(status)
                     .withProduct(producten == null || producten.size() == 0 ? null : producten.get(0))
                     .withDossierBeheerder(dossierBeheerder).withAgenten(agenten);
         }
 
         public DosisDossierTO build() {
-            return new DosisDossierTO(identificatie, uploadId, naam, wijzigingsDatum, status, producten, dossierBeheerder, agenten);
+            return new DosisDossierTO(identificatie, uploadId, naam, doorverwijzing, wijzigingsDatum, status, producten, dossierBeheerder, agenten);
         }
     }
 }

@@ -1,0 +1,30 @@
+dosisgateway:
+  storagefolder: target
+  wip:
+    highwater: 5000
+    lowwater: 4000
+  poller:
+    delay: 150
+    instances:
+      -   name: dev
+          url: http://localhost:29090/
+          itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 10
+  dosis:
+    clientId: 1234
+    tokenUrl: https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token
+    baseUrl: https://beta.dosis.dev-vlaanderen.be
+    bronUri: urn://some/test
+    privateWebKey: src/test/resources/jsonwebkeyprivate.key
+    delay: 150
+    backoffBase: 10
+    backoffExponent: 3
+    backoffMaxRetries: 10
+    showSecurityInManagementApi: false
+spring:
+  task:
+    scheduling:
+      pool:
+        size: 5 # Set this to at least  2 + nb of pollers.

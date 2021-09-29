@@ -1,0 +1,25 @@
+dosisgateway:
+  storagefolder: target
+  wip:
+    highwater: 5000
+    lowwater: 4000
+  poller:
+    delay: 150
+    instances:
+      -   name: dev
+          url: http://localhost:29090/
+          itemlimit: 100
+          backoffBase: 10
+          backoffExponent: 3
+          backoffMaxRetries: 10
+  dosis:
+    clientId: 1234
+    tokenUrl: http://localhost:9090/authorization
+    baseUrl: http://localhost:9090/base
+    bronUri: urn://some/test
+    privateWebKey: ../controller/src/test/resources/jsonwebkeyprivate.key
+    delay: 150
+    backoffBase: 10
+    backoffExponent: 3
+    backoffMaxRetries: 10
+    showSecurityInManagementApi: false

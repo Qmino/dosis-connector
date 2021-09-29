@@ -32,12 +32,12 @@ public class Pusher {
     // Values for exponential backoff
     private int consecutiveErrors = 0;
     private int skips = 0;
-    @Value("${dosisgateway.dosis.backoffBase}")
-    private int backoffBase = 10;
-    @Value("${dosisgateway.dosis.backoffExponent}")
-    private int backoffExponent = 3;
-    @Value("${dosisgateway.dosis.backoffMaxRetries}")
-    private int backoffMaxRetries = 10;
+    @Value("${dosisgateway.dosis.backoffBase: 10}")
+    private int backoffBase;
+    @Value("${dosisgateway.dosis.backoffExponent: 3}")
+    private int backoffExponent;
+    @Value("${dosisgateway.dosis.backoffMaxRetries: 10}")
+    private int backoffMaxRetries;
 
 
     // Current status
@@ -67,7 +67,7 @@ public class Pusher {
      * zal de methode stoppen met de opgelegde delay. Exponential backoff wordt gebruikt in geval er fouten zijn bij
      * het ophalen van de de gegevens bij het dossiersysteem.
      */
-    @Scheduled(fixedDelayString = "${dosisgateway.dosis.delay}")
+    @Scheduled(fixedDelayString = "${dosisgateway.dosis.delay: 150}")
     public void sendItems() {
         Optional<DosisItem> itemInState = wip.getItemInState(Verwerkingsstatus.TODO);
         while (active && itemInState.isPresent() &&

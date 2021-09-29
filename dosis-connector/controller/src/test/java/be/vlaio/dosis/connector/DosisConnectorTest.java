@@ -3,8 +3,9 @@ package be.vlaio.dosis.connector;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import be.vlaio.dosis.connector.controller.DosisController;
-import be.vlaio.dosis.connector.wip.PollerCommandLineRunner;
-import be.vlaio.dosis.connector.wip.WipCommandLineRunner;
+import be.vlaio.dosis.connector.pusher.Pusher;
+import be.vlaio.dosis.connector.pusher.Validator;
+import be.vlaio.dosis.connector.pusher.dosis.DosisClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,21 +17,18 @@ public class DosisConnectorTest {
 
 	@Autowired
 	private DosisController controllerCommandLineRunner;
-
 	@Autowired
-	private WipCommandLineRunner wipCommandLineRunner;
-
+	private Pusher pusher;
 	@Autowired
-	private PollerCommandLineRunner pollerCommandLineRunner;
-
-//	@Autowired
-//	private PusherCommandLineRunner pusherCommandLineRunner;
+	private Validator validator;
+	@Autowired
+	private DosisClient client;
 
 	@Test
 	void contextLoads() {
 		assertThat(controllerCommandLineRunner).isNotNull();
-		assertThat(wipCommandLineRunner).isNotNull();
-		assertThat(pollerCommandLineRunner).isNotNull();
-	//	assertThat(pusherCommandLineRunner).isNotNull();
+		assertThat(pusher).isNotNull();
+		assertThat(validator).isNotNull();
+		assertThat(client).isNotNull();
 	}
 }

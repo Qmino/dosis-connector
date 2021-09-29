@@ -1,4 +1,4 @@
-# Dosis-Connector
+# Dosis-Connector: Introductie
 
 <img src="documentation/logo-aio.svg" align="right" alt="Agentschap Innovatie en Ondernemen" width="120">
 
@@ -18,9 +18,9 @@ bron (d.w.z. ze hebben globaal een unieke id voor hun dossiers).
 * dbssim: deze folder bevat een simulator voor het dossierbeheersysteem welke kan
 gebruikt worden om de dosis-connector mee te testen.
 
-## Snel van start
+# Snel van start: bouwen en opstarten van de connector
 
-### Dosis-Connector bouwen
+## Dosis-Connector bouwen
 
 ```
 cd dosis-connector
@@ -37,7 +37,7 @@ java -jar .\controller\target\dosis-connector-controller-0.0.1-SNAPSHOT.jar
 Dit zal de connector opstarten op basis van de interne properties file. Commandline
 kan een externe property file worden meegegeven:
 
-### Dossierbeheersysteem simulator bouwen en uitvoeren
+## Dossierbeheersysteem simulator bouwen en uitvoeren
 Om de simulator voor het dossierbeheersysteem te bouwen doet men vervolgens: 
 ```
 cd dbssim
@@ -56,7 +56,16 @@ docker build -t vlaio/dbssim .
 docker run -p 29090:8080 vlaio/dbssim
 ```
 
-In dit geval zal de simulator draaien op poort 29090. De simulator simuleert twee services:
+In dit geval zal de simulator draaien op poort 29090. Meer informatie over de connector en de simulator, alsook hoe deze in detail kan geconfigureer worden volgt verder in dit document.
+
+
+
+
+
+
+## De Dossierbeheer simulator
+
+De simulator simuleert twee services:
 * /dossierstatusveranderingen: deze geeft een correcte respons terug
 * /fout/dossierstatusveranderingen: deze simuleert steeds een internal server error
 
@@ -75,14 +84,29 @@ generate:
 De simulator genereert ```itemsPerCycle``` nieuwe items, elke ```delay``` seconden, tot er in totaal ```maxItems``` zijn gegenereerd. Standaard zijn de gegenereerde items correct voor dosis. Indien je wil dat de simulator ook foutieve items genereert (deze hebben een incorrect rijksregisternummer), dan kan je dit kiezen via je ```errorPercentage``` dat aangeeft welk percentage van de gegenereerde items foutief moet zijn. De simulator laat ook toe om een vast product te kiezen ipv een random waarde, in welk geval je de waarde ook kan configureren.
 
 
-## Opbouw van de dosis-connector
+# Opbouw van de dosis-connector
 
 Conceptueel wordt de dosis-connector voorgesteld door volgend schema:
 
 <img src="documentation/ConnectorArchitectuur.png" alt="Architectuur Diagramma"/>
 
-## Componenten
-### De Poller
+Hieronder volgt een beschrijving van de verschillende componenten.
+
+## De Controller
+
+De controller component heeft twee belangrijke taken:
+* Opstarten en initialisatie van de andere componenten.
+* Opvragen van statusinformatie en aanbieden van herconfiguratie via een REST-webinterface.
+
+De controller biedt een niet geauthenticeerde Web API aan via poort 8080. Volgende endpoints zijn beschikbaar:
+
+| HTTP | URL                              | Korte beschrijving                                                                                            |
+|------|----------------------------------|---------------------------------------------------------------------------------------------------------------|
+| GET  | /rest/heartbeat                  | Geeft de vaste string 'ok' terug.                                                                             |
+| GET  | /rest/status                     | Geeft gedetaileerde status informatie                                                                         |
+| PUT  | /rest/poller/{pollerName}/active | Wijzig de actief/inactief status van een poller. Geef een json object mee met een enkel boolean field: ```active``` |
+
+## De Poller
 
 De poller(s) worden in de configuratiefile geconfigureerd onder de ```poller``` sectie die er uitziet als volgt:
 ```
@@ -102,12 +126,12 @@ De poller(s) worden in de configuratiefile geconfigureerd onder de ```poller``` 
           backoffExponent: 3
           backoffMaxRetries: 3
 ```
-#### Poll-gedrag
+### Poll-gedrag
 De poller haalt de items op bij het dossierbeheersysteem in batches die maximaal ```itemlimit``` groot zijn (geconfigureerd per poller). Zolang het dossierbeheersysteem nieuwe elementen teruggeeft, blijft de actie van de poller lopen en zal deze onmiddellijk opnieuw bijkomende elementen opvragen. Dit om achterstand snel weg te werken. Een poller begint steeds bij index 0, en de nieuwe index wordt berekend op basis van het index veld van het laatst verwerkte element. M.a.w. als het dossierbeheersysteem na een oproep van de poller (index 0, limit 10) twee elementen teruggeeft met indexen 3405 en 3409, zal de poller zijn volgende oproep beginnen bij 3410. **Het is dus heel belangrijk dat het dossierbeheersysteem elementen in volgorde van index teruggeeft!**
 
 Vanaf de poller in een oproep geen nieuwe elementen binnenkrijgt, wacht hij een bepaalde tijd alvorens opnieuw te proberen. Deze tijd wordt bepaald in de globale parameter ```delay```. De ```delay``` parameter is globaal gedeeld door de pollers. De tijd begint te tellen nadat de poller zijn vorige taak heeft afgerond.
 
-#### Exponential backoff
+### Exponential backoff
 
 Indien er een fout optreedt bij de communicatie naar het dossierbeheersysteem, implementeert Poller een exponential backoff principe, waarbij de poller steeds langer wacht om opnieuw te proberen tot deze uiteindelijk zichzelf permanent deactiveert. Dit gedrag wordt geconfigureerd door 3 parameters: ```backoffBase```, ```backoffExponent``` en ```backoffMaxRetries```. 
 
@@ -120,7 +144,7 @@ backoffBase  *  errors
 
 In bovenstaande formule is ```errors``` het aantal opeenvolgende fouten dat de poller bij de service is tegengekomen. Vanaf dit aantal ```backoffMaxRetries``` overschrijdt zal de poller niet meer pollen naar de service tot deze wordt gereactiveerd. 
 
-#### Voorbeeld
+### Voorbeeld
 
 Als de poller geconfigureerd is als volgt:
 
@@ -151,10 +175,7 @@ Bij terugkerende fouten aan het dossierbeheersysteem zal de poller als volgt opn
 
 Als die 10e retry dan ook gefaald is deactiveert de poller zich permanent
 
-
-### De Controller
-
-### De Pusher & De Validator
+## De Pusher & De Validator
 
 Zowel de pusher als de validator worden geconfigureerd in de configuratiefile onder de ```dosis``` sectie die er uitziet als volgt:
 ```
@@ -164,6 +185,11 @@ Zowel de pusher als de validator worden geconfigureerd in de configuratiefile on
     baseUrl: https://beta.dosis.dev-vlaanderen.be
     bronUri: urn://somebron/
     privateWebKey: someFileName.key
+    delay: 150
+    backoffBase: 10
+    backoffExponent: 3
+    backoffMaxRetries: 10
+    showSecurityInManagementApi: false
 ```
 
 Deze configuratieparameters bepalen het gedrag in de interactie met het DOSIS platform. 
@@ -172,7 +198,14 @@ Deze configuratieparameters bepalen het gedrag in de interactie met het DOSIS pl
 * De ```tokenUrl``` en ```baseUrl``` parameters bepalen welke URLS er worden gebruikt bij de communicatie naar DOSIS. In het bovenstaande voorbeeld zijn de waarden gekozen voor de beta/test omgeving. Voor productie zijn de waarden respectievelijk https://oauth.vlaanderen.be/authorization/ws/oauth/v2/token en https://prod.dosis-burgers.vlaanderen.be
 * De ```bronUri``` geeft aan onder welke bron alle dosis items die je zal publiceren zullen vallen bij DOSIS. De dosisconnector laat niet toe om meerdere bronUri's te specificeren. Indien je die nood hebt, zal je meerdere instanties van de dosisConnector moeten gebruiken.
 * ```privateWebKey``` is een verwijzing naar het bestand waar het private gedeelte van je Json Web Key kan gevonden worden. De Json webkey wordt gegenereerd als een paar waarvan het publieke gedeelte moet worden geupload in de admin site van DOSIS, en het private gedeelte ter beschikking moet staan van de dosis connector om de oproepen naar dosis te kunnen uitvoeren. Een gedetailleerde uitleg van ho je een Json Web Key kan genereren, alsook hoe je deze kan opladen kan je vinden op [deze url](https://vlaamseoverheid.atlassian.net/wiki/spaces/IKPubliek/pages/2680390681/Beveiliging+van+de+DOSIS-API#Hoe-een-JSON-Web-Token-lokaal-genereren). 
+* ```delay``` bepaalt om de hoeveel ms de pusher en de validator aan de WIP vragen of er nieuw werk is.
+* ```backoffBase```, ```backoffExponent```, ```backoffMaxRetries``` zijn parameters die het exponential backoff gedrag van de pusher en de validator naar DOSIS toe bepalen (bv, indien dosis onbereikbaar is gedurende korte periode).
+* ```showSecurityInManagementApi```. Deze waarde, welke default ```false``` is, laat toe om security gevoelige informatie (zoals bv het accesstoken), zichtbaar te maken via de management API. Dit kan handig zijn voor te testen.
 
-### De Validator
-### WorkInProgress & DiskStore
-## Onderlinge afhankelijkheden
+## WorkInProgress & DiskStore
+
+TODO
+
+# Onderlinge afhankelijkheden
+
+TODO
