@@ -12,12 +12,12 @@ dosisgateway:
           backoffBase: 10
           backoffExponent: 3
           backoffMaxRetries: 10
-      -   name: fout
-          url: http://localhost:29090/fout
-          itemlimit: 100
-          backoffBase: 10
-          backoffExponent: 3
-          backoffMaxRetries: 3
+#      -   name: fout
+#          url: http://localhost:29090/fout
+#          itemlimit: 100
+#          backoffBase: 10
+#          backoffExponent: 3
+#          backoffMaxRetries: 3
   dosis:
     clientId: 6776
     tokenUrl: https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token
@@ -37,6 +37,9 @@ logging:
         http: ERROR
     httpclient:
       wire: ERROR
+    be:
+      vlaio:
+        dosis: INFO
 spring:
   task:
     scheduling:

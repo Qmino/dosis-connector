@@ -29,5 +29,9 @@ public enum ServiceError {
     /**
      * Er is een probleem bij de authenticatie met de server
      */
-    AUTHENTICATION_ERROR
+    AUTHENTICATION_ERROR,
+    /*
+     *
+     */
+    NOT_FOUND;
 }

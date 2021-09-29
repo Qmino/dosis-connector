@@ -45,7 +45,7 @@ public class AdresTO {
 
     @JsonPOJOBuilder
     public static final class Builder {
-        private String type;
+        private String type = "Adres";
         private String straat;
         private String huisnummer;
         private String postcode;

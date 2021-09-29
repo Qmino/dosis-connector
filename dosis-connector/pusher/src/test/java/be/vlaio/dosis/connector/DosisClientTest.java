@@ -8,6 +8,7 @@ public class DosisClientTest {
 
     @Test
     public void otherTest() throws DosisClientException {
+        /*
         DosisClient client = new DosisClient("6775",
                 "https://beta.dosis.dev-vlaanderen.be",
                 "https://beta.oauth.vlaanderen.be/authorization/ws/oauth/v2/token",
@@ -15,5 +16,7 @@ public class DosisClientTest {
                 true);
         client.refreshAccessToken();
         System.out.println(client);
+
+         */
     }
 }

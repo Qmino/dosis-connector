@@ -57,7 +57,7 @@ public class ContactTO {
 
     @JsonPOJOBuilder
     public static final class Builder {
-        private String type;
+        private String type = "Contact";
         private String naam;
         private String dienst;
         private String telefoon;

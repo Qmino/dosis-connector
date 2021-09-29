@@ -58,7 +58,7 @@ public class Pusher {
         this.client = client;
         this.wip = wip;
         this.active = true;
-        LOGGER.info("DosisPusher Opgestart");
+        LOGGER.info("Pusher Opgestart");
     }
 
     /**
@@ -81,7 +81,7 @@ public class Pusher {
                 consecutiveErrors = 0;
                 lastResponse = "Dossier met nummer " + item.getDossierNummer() + " opgeladen met uploadId "
                         + result.getUploadId() + ". Dosis response status was: " + result.getStatus();
-                LOGGER.debug(lastResponse);
+                LOGGER.info(lastResponse);
                 wip.transitionItem(item, Verwerkingsstatus.UNVALIDATED);
             } catch (DosisClientException e) {
                 // Something went wrong.

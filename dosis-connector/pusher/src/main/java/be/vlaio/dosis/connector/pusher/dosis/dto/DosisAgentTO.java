@@ -29,7 +29,11 @@ public class DosisAgentTO {
             OndernemerAgent a = (OndernemerAgent) agent;
             this.identificatie = a.getKboNummer();
             for (ToegangsRecht recht: a.getToegangsRechten()) {
-                this.toegangsrechten.add(new DosisToegangsRechtTO(recht.getRecht()));
+                String toegangsRecht = recht.getRecht();
+                if (recht.getContext() != null && recht.getContext().length() > 0) {
+                    toegangsRecht += " - " + recht.getContext();
+                }
+                this.toegangsrechten.add(new DosisToegangsRechtTO(toegangsRecht));
             }
         } else if (agent instanceof BurgerAgent) {
             BurgerAgent a = (BurgerAgent) agent;

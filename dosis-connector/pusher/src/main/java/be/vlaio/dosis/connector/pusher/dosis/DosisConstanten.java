@@ -5,13 +5,9 @@ package be.vlaio.dosis.connector.pusher.dosis;
  */
 public class DosisConstanten {
 
-
-
-    public static final String DOSSIER_STATUS_UPLOAD_URL = "/api/v1/dosis/dossiers";
+    public static final String DOSSIER_STATUS_UPLOAD_URL =  "/api/v2/dossiers"; //"/api/v1/dosis/dossiers"; //
     public static final String DOSSIER_STATUS_RESULTATEN = "/api/v1/dosis/resultaten/perUploadId";
 
-    public static final String GRANT_TYPE = "client_credentials";
-    public static final String CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
     public static final String SCOPE = "DosisImport"; // "DOSISImport";
 
     // Deze parameter bepaalt hoeveel "op voorhand" de accesstoken refresht wordt.

@@ -7,6 +7,7 @@ import be.vlaio.dosis.connector.common.operational.ServiceError;
 import be.vlaio.dosis.connector.common.operational.Verwerkingsstatus;
 import be.vlaio.dosis.connector.pusher.dosis.DosisClient;
 import be.vlaio.dosis.connector.pusher.dosis.DosisClientException;
+import be.vlaio.dosis.connector.pusher.dosis.DosisClientInteractionException;
 import be.vlaio.dosis.connector.pusher.dosis.DosisTOFactory;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisDossierUploadValidatieTO;
 import be.vlaio.dosis.connector.pusher.dosis.dto.DosisVerwerkingFoutTO;
@@ -70,7 +71,7 @@ public class Validator {
      * fouten zijn bij connectie met DOSIS (bv internal server erros of timeouts).
      */
     @Scheduled(fixedDelayString = "${dosisgateway.dosis.delay}")
-    public void sendItems() {
+    public void validateItems() {
         Optional<DosisItem> itemInState = wip.getItemInState(Verwerkingsstatus.UNVALIDATED);
         while (active && itemInState.isPresent() &&
                 skips >= backoffBase * Math.pow(consecutiveErrors, backoffExponent)) {
@@ -84,7 +85,7 @@ public class Validator {
                 lastResponse = "Validatie van dossier " + item.getDossierNummer() + " (uploadId "
                         + result.getUploadId() + "). Dosis response status was: [Success: " + result.isSuccess()
                         + ", verwerkt: " + result.getVerwerktVoorOpvraging() + "]";
-                LOGGER.debug(lastResponse);
+                LOGGER.info(lastResponse);
                 Map<String, String> attributen = new HashMap<>();
                 attributen.put("Tijdstipverwerking", result.getTijdstipVerwerking().format(DateTimeFormatter.ISO_DATE_TIME));
                 attributen.put("Success", "" + result.isSuccess());
@@ -107,10 +108,21 @@ public class Validator {
                     LOGGER.info("Probleem bij authenticatie met Dosis: " + e.getMessage()
                             + "Client is gedeactiveerd. Manuele heractivatie is mogelijk, doch voor een aanpassing van " +
                             " de DOSIS configuratie is een herstart vereist.", e);
+                    lastResponse = "Authenticatieprobleem met dosis: " + e.getMessage();
                     active = false;
                 }
-                // If there is a client issue, we immediately transition the element to an error state
+                // If there is a client issue, there are two possibilities:
+                // We have a 404, which basically means we need to wait a little, we simply exit the routine.
+                // We have another service error, in which case we transition to FAILED.
                 if (e.getServiceError() == ServiceError.CLIENT_ERROR) {
+                    if (e instanceof DosisClientInteractionException) {
+                        DosisClientInteractionException exc = (DosisClientInteractionException) e;
+                        if (exc.getFaultyEntity() != null && exc.getFaultyEntity().getStatusCodeValue() == 404) {
+                            LOGGER.info("Validatie van dossier " + itemInState.get().getDossierNummer() + " (uploadId "
+                                    + itemInState.get().getId() +". Validatie nog niet beschikbaar. Will retry.");
+                            return;
+                        }
+                    }
                     Map<String, String> props = new HashMap<>();
                     props.put("foutBoodschap", e.getMessage());
                     wip.transitionItem(itemInState.get(), Verwerkingsstatus.FAILED, props);

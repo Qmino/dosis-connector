@@ -80,7 +80,7 @@ public class DossierbeheersysteemTOMother {
     }
 
 
-    private static StatusTO.Builder someStatus() {
+    public static StatusTO.Builder someStatus() {
         int fase = random.nextInt(6);
         return new StatusTO.Builder()
                 .withActie("Actie nr " + random.nextInt(10))
@@ -89,8 +89,9 @@ public class DossierbeheersysteemTOMother {
                 .withVlaamseFase(CommonTestMother.random(vlaamseFasen));
     }
 
-    private static ContactTO.Builder someContact() {
+    public static ContactTO.Builder someContact() {
         return new ContactTO.Builder()
+                .withNaam(CommonTestMother.randomPersoonNaam() + " Test")
                 .withAdres(someAdres().build())
                 .withEmail(CommonTestMother.randomEmail())
                 .withTelefoon("+3249" + RandomStringUtils.randomNumeric(7))
@@ -98,7 +99,7 @@ public class DossierbeheersysteemTOMother {
                 .withDienst("Dienst " + RandomStringUtils.randomNumeric(1));
     }
 
-    private static AdresTO.Builder someAdres() {
+    public static AdresTO.Builder someAdres() {
         return new AdresTO.Builder()
                 .withGemeente(CommonTestMother.randomStad())
                 .withPostcode(RandomStringUtils.randomNumeric(4))
@@ -106,7 +107,7 @@ public class DossierbeheersysteemTOMother {
                 .withHuisnummer(RandomStringUtils.randomNumeric(2));
     }
 
-    private static AgentTO someAgent() {
+    public static AgentTO someAgent() {
         if (random.nextBoolean()) {
             return someBurgerAgent().build();
         } else {
@@ -114,27 +115,27 @@ public class DossierbeheersysteemTOMother {
         }
     }
 
-    private static BurgerAgentTO.Builder someBurgerAgent() {
+    public static BurgerAgentTO.Builder someBurgerAgent() {
 
         return new BurgerAgentTO.Builder()
                 .withRijksregisternummer(randomRR());
     }
 
-    private static OndernemerAgentTO.Builder someOndernemerAgent() {
+    public static OndernemerAgentTO.Builder someOndernemerAgent() {
         return new OndernemerAgentTO.Builder()
-                .withKboNummer("BE" + RandomStringUtils.randomNumeric(9))
+                .withKboNummer("0" + RandomStringUtils.randomNumeric(9))
                 .withToegangsrechten(CommonTestMother.random(random.nextInt(4), () -> someToegangsRecht().build()));
     }
 
-    private static ToegangsRechtTO.Builder someToegangsRecht() {
+    public static ToegangsRechtTO.Builder someToegangsRecht() {
         return new ToegangsRechtTO.Builder()
                 .withRecht("Recht nr " + random.nextInt(10))
                 .withContext("Context nr " + random.nextInt(100));
     }
 
 
-    private static String randomRR() {
-        int year = 1940 + random.nextInt(80);
+    public static String randomRR() {
+        int year = random.nextInt(100);
         int month = 1 + random.nextInt(12);
         int day = 1 + random.nextInt(28);
         String rr = year + (month < 10 ? "0" + month : "" + month) + (day < 10 ? "0" + day : "" + day);

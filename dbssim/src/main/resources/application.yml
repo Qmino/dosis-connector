@@ -1,2 +1,9 @@
-hardcoded:
-  product: 1984
+generate:
+  delay: 30000
+  itemsPerCycle: 3
+  errorPercentage: 20
+  maxItems: 100
+  hardcoded:
+    product: 1984
+    rijksregisterNummer: "78020939715"
+    ondernemingsNummer: "0899772988"

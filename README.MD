@@ -60,6 +60,21 @@ In dit geval zal de simulator draaien op poort 29090. De simulator simuleert twe
 * /dossierstatusveranderingen: deze geeft een correcte respons terug
 * /fout/dossierstatusveranderingen: deze simuleert steeds een internal server error
 
+De dossiersimulator is beperkt configureerbaar via een spring properties file. Volgende yml file is aanwezig in de codebase (onder /src/main/resources/application/yml):
+
+```
+generate:
+  delay: 1000
+  itemsPerCycle: 3
+  errorPercentage: 20
+  maxItems: 100
+  hardcoded:
+    product: 1984
+```
+
+De simulator genereert ```itemsPerCycle``` nieuwe items, elke ```delay``` seconden, tot er in totaal ```maxItems``` zijn gegenereerd. Standaard zijn de gegenereerde items correct voor dosis. Indien je wil dat de simulator ook foutieve items genereert (deze hebben een incorrect rijksregisternummer), dan kan je dit kiezen via je ```errorPercentage``` dat aangeeft welk percentage van de gegenereerde items foutief moet zijn. De simulator laat ook toe om een vast product te kiezen ipv een random waarde, in welk geval je de waarde ook kan configureren.
+
+
 ## Opbouw van de dosis-connector
 
 Conceptueel wordt de dosis-connector voorgesteld door volgend schema:

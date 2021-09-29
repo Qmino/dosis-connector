@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 /**
@@ -221,6 +222,8 @@ public class DosisClient {
                 String message = extractMessage(rcre.getResponseBodyAsString());
                 if (rcre.getRawStatusCode() == 401) {
                     throw new DosisClientInteractionException(message, rce, ServiceError.AUTHENTICATION_ERROR, exchange);
+                } if (rcre.getRawStatusCode() == 404) {
+                    throw new DosisClientInteractionException(message, rce, ServiceError.NOT_FOUND, exchange);
                 } else if (HttpStatus.valueOf(rcre.getRawStatusCode()).is4xxClientError()) {
                     throw new DosisClientInteractionException(message, rce, ServiceError.CLIENT_ERROR, exchange);
                 } else if (HttpStatus.valueOf(rcre.getRawStatusCode()).is5xxServerError()) {
@@ -247,7 +250,8 @@ public class DosisClient {
     private String extractMessage(String responseBodyAsString) {
         try {
             DosisErrorResponseTO response = objectMapper.readValue(responseBodyAsString, DosisErrorResponseTO.class);
-            return response.getCode() + "(" + response.getMessage() + "): " + response.getDescription();
+            return response.getMessage() + " (" +response.getErrors().stream().map(r -> "[" + r.getCode() + "/" + r.getField() +"]: " + r.getMessage())
+                    .collect(Collectors.joining("; ")) + ")";
         } catch (JsonProcessingException e) {
             return responseBodyAsString;
         }

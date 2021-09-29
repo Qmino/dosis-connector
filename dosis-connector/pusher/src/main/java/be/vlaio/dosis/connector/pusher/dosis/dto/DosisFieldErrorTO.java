@@ -3,21 +3,19 @@ package be.vlaio.dosis.connector.pusher.dosis.dto;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-import java.util.List;
-
-@JsonDeserialize(builder=DosisErrorResponseTO.Builder.class)
-public class DosisErrorResponseTO {
+@JsonDeserialize(builder= DosisFieldErrorTO.Builder.class)
+public class DosisFieldErrorTO {
 
     private String code;
     private String message;
     private String description;
-    private List<DosisFieldErrorTO> errors;
+    private String field;
 
-    public DosisErrorResponseTO(String code, String message, String description, List<DosisFieldErrorTO> errors) {
+    public DosisFieldErrorTO(String code, String message, String description, String field) {
         this.code = code;
         this.message = message;
         this.description = description;
-        this.errors = errors;
+        this.field = field;
     }
 
     public String getCode() {
@@ -32,8 +30,8 @@ public class DosisErrorResponseTO {
         return description;
     }
 
-    public List<DosisFieldErrorTO> getErrors() {
-        return errors;
+    public String getField() {
+        return field;
     }
 
     @JsonPOJOBuilder
@@ -41,7 +39,7 @@ public class DosisErrorResponseTO {
         private String code;
         private String message;
         private String description;
-        private List<DosisFieldErrorTO> errors;
+        private String field;
 
         public Builder() {
         }
@@ -61,13 +59,13 @@ public class DosisErrorResponseTO {
             return this;
         }
 
-        public Builder withErrors(List<DosisFieldErrorTO> errors) {
-            this.errors = errors;
+        public Builder withField(String field) {
+            this.field = field;
             return this;
         }
 
-        public DosisErrorResponseTO build() {
-            return new DosisErrorResponseTO(code, message, description, errors);
+        public DosisFieldErrorTO build() {
+            return new DosisFieldErrorTO(code, message, description, field);
         }
     }
 }
